@@ -1,4 +1,7 @@
 /** What the laboratory can currently say about itself. §89 */
+import { loadEnv } from '../lab/env';
+
+loadEnv();
 import { readState, buildRegistry } from '../lab/runtime';
 import { verifyChain } from '../lab/ledger/events';
 import { DECLARED_ABSENCES } from '../lab/capabilities/registry';

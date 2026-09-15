@@ -6,7 +6,7 @@
  * back to the offline proposer, which is labelled honestly everywhere it appears (§57).
  */
 import { LocalHeuristicProvider } from './providers/local-heuristic';
-import { OpenRouterProvider } from './providers/openrouter';
+import { MultiModelProvider } from './providers/multi';
 import { sealProposal, validateAgainstRole, type NanoContext, type NanoProposal, type NanoRole } from './contract';
 import { provenance } from '../provenance/provenance';
 import type { ModelProvider } from './provider';
@@ -22,15 +22,11 @@ export class NanoRouter {
 
   constructor(opts: RouterOptions = {}) {
     const providers: ModelProvider[] = [];
-    if (opts.openRouterApiKey) {
-      providers.push(
-        new OpenRouterProvider({
-          apiKey: opts.openRouterApiKey,
-          ...(opts.models ? { models: opts.models } : {}),
-          ...(opts.fetchImpl ? { fetchImpl: opts.fetchImpl } : {}),
-          title: 'abedkadaan.com research laboratory',
-        }),
-      );
+    // Any configured provider serves the loop; with none, the offline proposer does,
+    // and says so. The `openRouterApiKey` option is retained so existing callers keep
+    // working, but provider selection now comes from the shared population. §23
+    if (MultiModelProvider.configured() || opts.openRouterApiKey) {
+      providers.push(new MultiModelProvider());
     }
     providers.push(new LocalHeuristicProvider());
     this.providers = providers;

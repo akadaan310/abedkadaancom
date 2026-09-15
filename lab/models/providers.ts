@@ -116,6 +116,18 @@ export interface ChatRequest {
   readonly timeoutMs?: number;
   /** Restrict to these provider names, in this order. Defaults to the configured order. */
   readonly only?: readonly string[];
+  /**
+   * A key supplied by the visitor for this one call.
+   *
+   * It is used for the single request and never written to disk, a log, or the ledger.
+   * The laboratory's own keys are not used when this is present, and no record of the
+   * visitor's key survives the response.
+   */
+  readonly bringYourOwn?: { readonly provider: string; readonly apiKey: string; readonly model?: string };
+}
+
+export function providerByName(name: string): ProviderConfig | undefined {
+  return PROVIDERS.find((p) => p.name === name);
 }
 
 /**
@@ -125,11 +137,22 @@ export interface ChatRequest {
 export async function chat(req: ChatRequest): Promise<ChatResult> {
   const tier = req.tier ?? 'fast';
   const timeoutMs = req.timeoutMs ?? 20000;
-  const candidates = configuredProviders().filter((p) => !req.only || req.only.includes(p.name));
+  const byo = req.bringYourOwn;
+  const byoConfig = byo ? providerByName(byo.provider) : undefined;
+  const candidates = byoConfig
+    ? [byoConfig]
+    : configuredProviders().filter((p) => !req.only || req.only.includes(p.name));
   const attempts: ChatAttempt[] = [];
 
+  if (byo && !byoConfig) {
+    throw new NoProviderAvailable([
+      { provider: byo.provider, model: '—', ok: false, latencyMs: 0, error: `unknown provider "${byo.provider}"` },
+    ]);
+  }
+
   for (const provider of candidates) {
-    const model = provider.models[tier];
+    const model = byo?.model || provider.models[tier];
+    const apiKey = byo?.apiKey ?? process.env[provider.apiKeyEnv];
     const started = Date.now();
     try {
       const controller = new AbortController();
@@ -140,7 +163,7 @@ export async function chat(req: ChatRequest): Promise<ChatResult> {
           method: 'POST',
           signal: controller.signal,
           headers: {
-            Authorization: `Bearer ${process.env[provider.apiKeyEnv]}`,
+            Authorization: `Bearer ${apiKey}`,
             'Content-Type': 'application/json',
             ...(provider.headers ?? {}),
           },

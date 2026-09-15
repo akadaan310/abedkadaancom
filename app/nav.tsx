@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
  *  their own index, so the front of the site is not a control panel. */
 export const SECTIONS = [
   ['/practice', 'Practice'],
+  ['/arcade', 'Arcade'],
   ['/dispatches', 'Dispatches'],
   ['/laboratory', 'Laboratory'],
   ['/constitution', 'Constitution'],

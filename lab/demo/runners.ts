@@ -21,7 +21,7 @@ import { project } from '../ledger/projection';
 import { tick } from '../loop/tick';
 import { NanoRouter } from '../nano/router';
 import { ROLES } from '../nano/roles';
-import { NanoProposalBodySchema } from '../nano/contract';
+import { describeRequestShapes, NanoProposalBodySchema } from '../nano/contract';
 import type { ComputedBlock, DemoOutput, DemoProvenance } from './types';
 import type { Corpus, Measurement } from '../ontology/types';
 
@@ -400,7 +400,9 @@ export async function boundedAgents(input: string): Promise<DemoOutput> {
         '{"proposalType":"ENGINE|HYPOTHESIS|OBSERVATION|INTERPRETATION|COUNTEREXAMPLE|CAPABILITY_REQUEST|ABSTAIN",' +
         '"summary":"...","rationale":"...","confidence":0.0,"epistemicType":"AI_PROPOSAL|AI_HYPOTHESIS|AI_OBSERVATION|AI_INTERPRETATION|AI_COUNTEREXAMPLE|UNRESOLVED",' +
         '"requests":[],"evidenceIds":[],"wouldBeWrongIf":"..."}. ' +
-        'You may propose; you may not conclude. Answer the user’s request as such a proposal.',
+        'Each entry in "requests" must be an object matching exactly one of these shapes:\n' +
+        describeRequestShapes(role.allowedOps) +
+        '\nYou may propose; you may not conclude. Answer the user’s request as such a proposal.',
       user: question,
       json: true,
       maxTokens: 600,

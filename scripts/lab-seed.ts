@@ -3,6 +3,9 @@
  * This admits the research material and opens the first frontier items. It computes
  * nothing and concludes nothing — the loop does that.
  */
+import { loadEnv } from '../lab/env';
+
+loadEnv();
 import { provenance } from '../lab/provenance/provenance';
 import { contentId } from '../lab/ontology/canonical';
 import { frontierItem } from '../lab/frontier/frontier';

@@ -1,4 +1,7 @@
 /** Run one turn of the continuous intelligence loop. §24, §44 */
+import { loadEnv } from '../lab/env';
+
+loadEnv();
 import { tick } from '../lab/loop/tick';
 import { ledgerStore, loadCorpora, router } from '../lab/runtime';
 

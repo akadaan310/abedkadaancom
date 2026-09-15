@@ -559,3 +559,69 @@ nav.secondary a[aria-current="page"] { color: var(--ink); border-bottom-color: v
   font-family: var(--mono); font-size: 0.7rem; color: var(--faint);
   border-top: 1px solid var(--rule); padding-top: 0.75rem; margin-top: 1.25rem; word-break: break-word;
 }
+
+/* ---------------------------------------------------------------- arcade */
+
+.cabinet { border-top: 2px solid var(--ink); margin: 2.5rem 0; padding-top: 1.1rem; }
+.cabinet-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; }
+.cabinet-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+}
+.cabinet-toggle, .cabinet-secondary {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  background: none; border: none; border-bottom: 1px solid var(--rule-firm); color: var(--muted);
+  cursor: pointer; padding: 0.55rem 0; min-height: 44px;
+}
+.cabinet-toggle:hover, .cabinet-secondary:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+.cabinet-key { border: 1px solid var(--rule-firm); padding: 1rem; margin-top: 1rem; background: var(--paper-sunk); }
+.cabinet-key-fields { display: grid; gap: 0.85rem; margin-top: 0.9rem; }
+.cabinet-key-fields label { display: block; }
+.cabinet-key-fields span {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.13em; text-transform: uppercase;
+  color: var(--muted); display: block; margin-bottom: 0.35rem;
+}
+.cabinet-key-fields input, .cabinet-key-fields select {
+  width: 100%; font-family: var(--mono); font-size: 0.82rem; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--rule-firm); padding: 0.6rem 0.7rem; min-height: 44px;
+}
+@media (min-width: 40rem) { .cabinet-key-fields { grid-template-columns: 8rem 1fr 1fr; align-items: end; } }
+
+.transcript { margin-top: 1.5rem; }
+.turn { border-top: 1px solid var(--rule); padding: 1rem 0; }
+.turn-label {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--faint); display: block; margin-bottom: 0.5rem;
+}
+.turn--user .turn-body { color: var(--muted); font-style: italic; }
+.turn-body { white-space: pre-wrap; word-break: break-word; line-height: 1.6; }
+.turn--model .turn-body { font-size: 0.97rem; }
+
+.cabinet-form { margin-top: 1.5rem; }
+.cabinet-form textarea {
+  width: 100%; font-family: var(--mono); font-size: 0.85rem; line-height: 1.6; color: var(--ink);
+  background: var(--paper-sunk); border: 1px solid var(--rule-firm); padding: 0.75rem 0.85rem; resize: vertical;
+}
+.cabinet-form textarea:focus { outline: 2px solid var(--ink); outline-offset: -2px; }
+.cabinet-actions { display: flex; gap: 1.25rem; align-items: center; margin-top: 0.9rem; flex-wrap: wrap; }
+.cabinet-form button[type="submit"] {
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--paper); background: var(--ink); border: 1px solid var(--ink);
+  padding: 0.7rem 1.4rem; cursor: pointer; min-height: 44px;
+}
+.cabinet-form button[type="submit"]:disabled { opacity: 0.4; cursor: default; }
+
+/* The prompt itself, printed so it can be taken away. */
+.prompt-block {
+  border: 1px solid var(--rule-firm); background: var(--paper-sunk);
+  padding: 1rem; margin-top: 1rem; max-height: 30rem; overflow-y: auto;
+}
+.prompt-block pre { white-space: pre-wrap; word-break: break-word; color: var(--ink-soft); font-size: 0.78rem; }
+
+.cat-nav { display: flex; gap: 0 1.25rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+.cat-nav a {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--muted); display: inline-flex; align-items: center; min-height: 44px;
+  border-bottom: 2px solid transparent;
+}
+.cat-nav a[aria-current="true"] { color: var(--ink); border-bottom-color: var(--ink); }

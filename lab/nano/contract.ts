@@ -179,3 +179,31 @@ export function validateAgainstRole(role: NanoRole, body: NanoProposalBody): str
   }
   return problems;
 }
+
+/**
+ * The shape of each operation, published to the model.
+ *
+ * §66: a participant should be able to ask "what can I actually use?" rather than guess.
+ * Telling a model the field names of the operations its role permits is the difference
+ * between a meaningful refusal and a trivial one.
+ */
+const REQUEST_SHAPES: Readonly<Record<NanoRequest['op'], string>> = {
+  proposeRelation: '{"op":"proposeRelation","relationKind":"string","endpoints":["id","id"],"reason":"string"}',
+  proposeTransformation: '{"op":"proposeTransformation","name":"string","claim":"INVERTIBLE|LOSSY|UNKNOWN","reason":"string"}',
+  recordHypothesis: '{"op":"recordHypothesis","statement":"string","testableAs":"string"}',
+  composeEngine:
+    '{"op":"composeEngine","name":"string","purpose":"string","question":"string",' +
+    '"steps":[{"capability":"must exist in the register","from":["input"],"as":"name","config":{}}],' +
+    '"nullModel":"string or null"}',
+  proposeExperiment: '{"op":"proposeExperiment","engineRef":"string","question":"string","inputs":{}}',
+  requestMeasurement: '{"op":"requestMeasurement","statistic":"string","subjectId":"string"}',
+  requestCounterexample: '{"op":"requestCounterexample","againstEngineId":"string","strategy":"string"}',
+  requestStructure: '{"op":"requestStructure","fromRelationKind":"string","method":"string"}',
+  requestTraversal: '{"op":"requestTraversal","fromId":"string","toId":"string"}',
+  requestCapability: '{"op":"requestCapability","name":"string","why":"string"}',
+};
+
+export function describeRequestShapes(ops: readonly NanoRequest['op'][]): string {
+  if (ops.length === 0) return 'This role may not make any request. Leave "requests" as an empty array.';
+  return ops.map((op) => `  ${REQUEST_SHAPES[op]}`).join('\n');
+}
