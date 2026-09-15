@@ -71,6 +71,7 @@ export default async function Visit({ params }: { params: Promise<{ guest: strin
   return (
     <>
       <Band label={`Entrance · ${guest.name}`}>
+        {slug === 'founders' && <FoundersEntrance f={f} />}
         {slug === 'public' && <PublicEntrance f={f} />}
         {slug === 'family' && <FamilyEntrance f={f} />}
         {slug === 'friends' && <FriendsEntrance f={f} />}
@@ -116,6 +117,46 @@ function Onward({ links }: { links: [string, string][] }) {
         </li>
       ))}
     </ul>
+  );
+}
+
+function FoundersEntrance({ f }: { f: Facts }) {
+  return (
+    <div className="column">
+      <p className="lede">You are deciding something, and the evidence came from somewhere you cannot see.</p>
+      <p className="note">
+        The question worth asking about any number is not whether it is impressive. It is how much weight it will bear,
+        what would have to be true for it to be wrong, and what the cheapest test is that would find out. Most analysis
+        never answers those three, because answering them risks the answer being no.
+      </p>
+      <p className="note">
+        This site is the demonstration rather than the pitch. It is a laboratory that builds its own measuring
+        instruments, fixes the criteria for success before running them, tests results against chance, and attacks its
+        own findings. Right now it reports {f.supported === 0 ? 'zero findings' : `${f.supported} findings`} —{' '}
+        {f.supported === 0
+          ? 'and says so on its own front page. That is the behaviour you are buying: a system that can tell you there is nothing there.'
+          : 'each published with the null model used and a written statement of what it does not license.'}
+      </p>
+      <div className="figures" style={{ margin: '1.75rem 0' }}>
+        <Figure value={f.runs} label="instruments executed" />
+        <Figure value={f.failedRuns} label="failed their own criteria" />
+        <Figure value={f.challenges} label="challenges run against results" />
+        <Figure value={f.supported} label="findings claimed" />
+      </div>
+      <p className="note">
+        The most relevant thing here is a failure. The first instrument this laboratory built produced a
+        significant-looking result that turned out to be an artefact of a badly chosen test. It was caught by a control
+        designed to contain nothing. That is the class of error that survives into board decks and term sheets, and it
+        is what the validation work exists to find.
+      </p>
+      <Onward
+        links={[
+          ['/dispatches/the-result-that-wasnt', 'The result that was not there — the failure, in full, in ten minutes'],
+          ['/practice/decision-support', 'Decision support — whether a number is solid enough to bet on'],
+          ['/practice', 'The practice — all ten services'],
+        ]}
+      />
+    </div>
   );
 }
 

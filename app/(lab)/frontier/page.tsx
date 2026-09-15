@@ -1,8 +1,8 @@
 /** The frontier: what has not been done, and what cannot be. §46, §56, §75, §90 */
-import { readState } from '../../lab/runtime';
-import { rankFrontier, utility } from '../../lab/frontier/frontier';
-import { DECLARED_ABSENCES } from '../../lab/capabilities/registry';
-import { Band, Tag, fmt } from '../ui';
+import { readState } from '../../../lab/runtime';
+import { rankFrontier, utility } from '../../../lab/frontier/frontier';
+import { DECLARED_ABSENCES } from '../../../lab/capabilities/registry';
+import { Band, Tag, fmt } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 

@@ -99,7 +99,7 @@ a.plain, a.plain:hover { border-bottom: none; }
 /* ------------------------------------------------------------------ masthead */
 
 .masthead { border-bottom: 1px solid var(--rule-firm); }
-.masthead-inner { padding: 1.4rem 0 0; }
+.masthead-inner { padding-top: 1.4rem; }
 .wordmark { display: block; border: none; }
 .wordmark:hover { border: none; }
 .wordmark .name {
@@ -131,15 +131,19 @@ nav.primary a {
   letter-spacing: 0.13em;
   text-transform: uppercase;
   color: var(--muted);
-  padding: 0.55rem 0;
+  /* 44px minimum: a nav link is a control, and a 30px target fails on a phone. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0.35rem 0;
   border-bottom: 2px solid transparent;
 }
 nav.primary a:hover { color: var(--ink); border-bottom-color: var(--rule-firm); }
 nav.primary a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
 
 @media (max-width: 40rem) {
-  nav.primary { gap: 0 1rem; margin-top: 1.1rem; }
-  nav.primary a { font-size: 10.5px; padding: 0.45rem 0; }
+  nav.primary { gap: 0 1rem; margin-top: 0.6rem; }
+  nav.primary a { font-size: 10.5px; }
 }
 
 /* ------------------------------------------------------------------ headings */
@@ -159,7 +163,8 @@ h1, h2, h3 { font-weight: 400; margin: 0; }
   margin: 0;
 }
 .subhead { font-size: 1.12rem; line-height: 1.5; color: var(--ink-soft); }
-h3.record-title { font-size: 1.06rem; line-height: 1.35; }
+/* Long monospace identifiers must break rather than widen the viewport on a phone. */
+h3.record-title { font-size: 1.06rem; line-height: 1.35; overflow-wrap: anywhere; }
 
 p { margin: 0 0 1rem; }
 p:last-child { margin-bottom: 0; }
@@ -212,6 +217,7 @@ pre {
 
 /* A measured statement: the number, then what it is not allowed to mean. */
 .guard {
+  overflow-wrap: anywhere;
   border-left: 1px solid var(--rule-firm);
   padding-left: 0.85rem;
   margin: 0.7rem 0 0;
@@ -301,7 +307,8 @@ tbody tr:last-child td { border-bottom: none; }
 .colophon {
   border-top: 1px solid var(--rule-firm);
   margin-top: 4.5rem;
-  padding: 1.5rem 0 3.5rem;
+  padding-top: 1.5rem;
+  padding-bottom: 3.5rem;
   color: var(--muted);
   font-size: 0.86rem;
 }
@@ -311,3 +318,244 @@ tbody tr:last-child td { border-bottom: none; }
 }
 
 main { padding-bottom: 1rem; }
+
+/* ============================================================================
+   MAGAZINE LAYER
+   The laboratory is the evidence; this is the publication that carries it.
+   Black, white, paper. Editorial hierarchy: kicker, display, dek, rule, column.
+   No decoration that is not typography, rule or space.
+   ========================================================================== */
+
+.cover { padding: 3.5rem 0 0; }
+@media (max-width: 40rem) { .cover { padding-top: 2.25rem; } }
+
+.kicker {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: block;
+  margin-bottom: 1.4rem;
+}
+
+.headline {
+  font-size: clamp(2.1rem, 7.2vw, 4.1rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  margin: 0;
+  max-width: 19ch;
+  text-wrap: balance;
+}
+.headline--sm { font-size: clamp(1.7rem, 5vw, 2.6rem); max-width: 24ch; }
+
+.dek {
+  font-size: clamp(1.05rem, 2.4vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--ink-soft);
+  max-width: 44ch;
+  margin-top: 1.6rem;
+}
+
+.byline {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-top: 2rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.rule-heavy { border: none; border-top: 2px solid var(--ink); margin: 2.75rem 0 0; }
+
+/* Contents: a numbered index, as on a masthead page. */
+.contents { list-style: none; margin: 0; padding: 0; counter-reset: item; }
+.contents > li { border-top: 1px solid var(--rule); }
+.contents > li:first-child { border-top: none; }
+.contents a, .contents .row-static {
+  display: grid;
+  grid-template-columns: 3rem 1fr;
+  gap: 0 1.25rem;
+  padding: 1.4rem 0;
+  border: none;
+  align-items: start;
+}
+.contents a:hover { border: none; background: var(--paper-sunk); }
+.contents .no {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--faint);
+  padding-top: 0.35rem;
+}
+.contents h3 { font-size: 1.22rem; line-height: 1.25; letter-spacing: -0.01em; }
+.contents .what { color: var(--muted); font-size: 0.95rem; margin-top: 0.4rem; max-width: 52ch; }
+.contents .for {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--faint); margin-top: 0.7rem; display: block;
+}
+@media (max-width: 40rem) {
+  .contents a, .contents .row-static { grid-template-columns: 2.1rem 1fr; gap: 0 0.85rem; padding: 1.15rem 0; }
+  .contents h3 { font-size: 1.1rem; }
+}
+
+/* Feature typography */
+.feature { max-width: 36rem; }
+.feature p { font-size: 1.06rem; line-height: 1.68; }
+.feature > p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.6rem;
+  line-height: 0.82;
+  padding: 0.16rem 0.6rem 0 0;
+  font-weight: 400;
+}
+.pullquote {
+  border-top: 2px solid var(--ink);
+  border-bottom: 2px solid var(--ink);
+  padding: 1.3rem 0;
+  margin: 2.5rem 0;
+  font-size: clamp(1.25rem, 3.4vw, 1.6rem);
+  line-height: 1.32;
+  letter-spacing: -0.015em;
+  max-width: 28ch;
+}
+.standfirst {
+  font-size: 1.14rem;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  border-left: 2px solid var(--ink);
+  padding-left: 1.1rem;
+  margin: 0 0 2rem;
+}
+
+/* A data table set as an editorial exhibit. */
+.exhibit { margin: 2.25rem 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--rule-firm); }
+.exhibit-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); padding: 0.7rem 0 0.9rem;
+}
+.exhibit table { font-size: 0.86rem; }
+.exhibit caption {
+  caption-side: bottom; text-align: left; color: var(--muted);
+  font-size: 0.86rem; padding-top: 0.85rem; line-height: 1.5;
+}
+
+/* Native disclosure — works without scripting, so it always works. */
+details.more { border-top: 1px solid var(--rule); padding: 0.9rem 0; }
+details.more > summary {
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  display: flex;
+  gap: 0.65rem;
+  align-items: baseline;
+}
+details.more > summary::-webkit-details-marker { display: none; }
+details.more > summary::before { content: '+'; color: var(--faint); }
+details.more[open] > summary::before { content: '–'; }
+details.more > summary:hover { color: var(--ink); }
+details.more .more-body { padding-top: 1rem; max-width: 40rem; }
+
+/* Engagement / contact block */
+.signoff { border-top: 2px solid var(--ink); margin-top: 3.5rem; padding-top: 1.5rem; }
+
+/* Secondary navigation for the laboratory records. */
+nav.secondary {
+  border-bottom: 1px solid var(--rule);
+  padding: 1.1rem 0 0.9rem;
+  margin-bottom: 0.5rem;
+}
+nav.secondary .secondary-home {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--faint); border: none; margin-bottom: 0.2rem;
+}
+nav.secondary .secondary-home:hover { color: var(--ink); }
+nav.secondary .secondary-links { display: flex; flex-wrap: wrap; gap: 0 1.1rem; }
+nav.secondary a {
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted); border-bottom: 1px solid transparent;
+}
+nav.secondary .secondary-links a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0.2rem 0;
+}
+nav.secondary .secondary-home { display: inline-flex; align-items: center; min-height: 44px; }
+nav.secondary .secondary-links a:hover { color: var(--ink); border-bottom-color: var(--rule-firm); }
+nav.secondary a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+
+/* ---------------------------------------------------------------- demos */
+
+.demo { border-top: 2px solid var(--ink); margin: 2.75rem 0; padding-top: 1.25rem; }
+.demo-head { max-width: 40rem; }
+.demo-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--muted); display: block; margin-bottom: 0.7rem;
+}
+.demo-title { font-size: 1.25rem; line-height: 1.3; margin-bottom: 0.5rem; }
+
+.demo-form { margin-top: 1.5rem; max-width: 40rem; }
+.demo-field-label {
+  font-family: var(--mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--muted); display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 0.5rem;
+}
+.demo-count { color: var(--faint); }
+.demo textarea {
+  width: 100%;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--paper-sunk);
+  border: 1px solid var(--rule-firm);
+  padding: 0.75rem 0.85rem;
+  resize: vertical;
+}
+.demo textarea:focus { outline: 2px solid var(--ink); outline-offset: -2px; }
+.demo button {
+  margin-top: 0.9rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper);
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+  min-height: 44px;
+}
+.demo button:hover:not(:disabled) { background: var(--ink-soft); }
+.demo button:disabled { opacity: 0.45; cursor: default; }
+
+.demo-running { margin-top: 1rem; }
+.demo-result { margin-top: 1.75rem; }
+.demo-block { border-top: 1px solid var(--rule); padding: 1.1rem 0; }
+.demo-block-label {
+  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink); display: block; margin-bottom: 0.8rem;
+}
+/* Model output is set apart typographically, because it is a different kind of claim. */
+.demo-block-label--model { color: var(--muted); }
+.demo-note { margin-top: 0.7rem; max-width: 46rem; }
+.demo-output {
+  background: var(--paper-sunk);
+  border: 1px solid var(--rule);
+  padding: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--ink-soft);
+  max-height: 22rem;
+  overflow-y: auto;
+}
+.demo-foot {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--faint);
+  border-top: 1px solid var(--rule); padding-top: 0.75rem; margin-top: 1.25rem; word-break: break-word;
+}

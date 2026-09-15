@@ -21,6 +21,11 @@ export interface Guest {
 
 export const GUESTS: readonly Guest[] = [
   {
+    slug: 'founders',
+    name: 'Founders and leaders',
+    who: 'You have a decision riding on whether a number is real.',
+  },
+  {
     slug: 'public',
     name: 'Just looking',
     who: 'You landed here and want to know what this is, in plain words.',

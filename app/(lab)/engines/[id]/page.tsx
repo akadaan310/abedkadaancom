@@ -2,8 +2,8 @@
  * One instrument: why it formed, what it was required to prove, what it ran, what failed.
  * §8, §54, §55 — the machinery of a result is part of the result.
  */
-import { readState } from '../../../lab/runtime';
-import { Band, EpistemicTag, StatusTag, Tag, actorLabel, fmt } from '../../ui';
+import { readState } from '../../../../lab/runtime';
+import { Band, EpistemicTag, StatusTag, Tag, actorLabel, fmt } from '../../../ui';
 
 export const dynamic = 'force-dynamic';
 

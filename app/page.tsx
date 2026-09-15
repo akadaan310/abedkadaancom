@@ -1,133 +1,115 @@
 /**
- * The front door.
+ * The cover.
  *
- * Quiet by intent. It establishes what the laboratory is, what it currently knows, what
- * it does not know, and where a visitor enters the machinery — and nothing else. Every
- * figure is read from the ledger; §57 forbids manufacturing activity to look alive.
+ * A publication, not a control panel. It states what the practice is, demonstrates it
+ * live before asking for anything, lists the services, and offers a way in for each kind
+ * of visitor. Every figure is read from the ledger; §57 forbids manufactured activity.
  */
 import { readState, buildRegistry } from '../lab/runtime';
-import { DECLARED_ABSENCES } from '../lab/capabilities/registry';
 import { verifyChain } from '../lab/ledger/events';
+import { demoFor } from '../lab/demo';
+import { SERVICES } from './services';
 import { GUESTS } from './guests';
-import { Band, Tag } from './ui';
+import { Demo } from './demo';
+import { Band } from './ui';
 
 export const dynamic = 'force-dynamic';
 
-export default async function FrontDoor() {
+export default async function Cover() {
   const state = await readState();
   const registry = buildRegistry();
   const chain = verifyChain(state.events);
-
   const supported = state.discoveries.filter((d) => d.state === 'SUPPORTED' || d.state === 'KNOWN');
-  const openFrontier = state.frontier.filter((f) => f.state !== 'CLOSED');
-  const testedAgainstNull = state.measurements.filter((m) => m.nullModel);
-  const unverified = state.corpora.filter((c) => c.sourceVerification !== 'VERIFIED_AGAINST_EDITION');
-
-  const entries: [string, string, string][] = [
-    ['/observatory', 'Observatory', 'The laboratory in its current state: activity, instruments, and what it measures about itself.'],
-    ['/engines', 'Engines', 'Research instruments — why each was formed, what it was required to prove, what it ran.'],
-    ['/findings', 'Findings', 'Measurements, separated by whether they exceeded a declared null model.'],
-    ['/frontier', 'Frontier', 'What has not been done, what is blocked, and what this laboratory cannot compute.'],
-    ['/capabilities', 'Capabilities', 'Every computation available, its contract, and the terms on which an agent may participate.'],
-    ['/corpus', 'Corpus', 'The register of admitted research material and its verification status.'],
-    ['/ledger', 'Ledger', 'The append-only hash-chained record of everything that happened.'],
-    ['/constitution', 'Constitution', 'The document this laboratory was built from, and how to read what it reports.'],
-  ];
-  const counts: Record<string, string> = {
-    '/observatory': `${state.metrics.events} events`,
-    '/engines': `${state.engines.length}`,
-    '/findings': `${state.measurements.length}`,
-    '/frontier': `${openFrontier.length} open`,
-    '/capabilities': `${registry.names().length}`,
-    '/corpus': `${state.corpora.length}`,
-    '/ledger': chain.intact ? 'intact' : 'BROKEN',
-    '/constitution': '100 §',
-  };
+  const withNull = state.measurements.filter((m) => m.nullModel);
+  const flagship = demoFor('time-durable-communication');
 
   return (
     <>
-      <div style={{ paddingTop: '4rem' }}>
-        <p className="display column">
-          A computational laboratory for constructing, measuring, challenging, and preserving research instruments.
+      <div className="cover">
+        <span className="kicker">Independent computational intelligence</span>
+        <h1 className="headline">
+          I build instruments that measure what has not been measured — then I try to break them.
+        </h1>
+        <p className="dek">
+          Analytic tradecraft, engineering scale, and the method published in the open — failures included.
+          The laboratory below is not a case study. It is running, and it currently reports nothing.
         </p>
+        <div className="byline">
+          <span>{SERVICES.length} services</span>
+          <span>{state.engines.length} instruments built</span>
+          <span>{supported.length} findings claimed</span>
+          <span>Ledger {chain.intact ? 'intact' : 'broken'}</span>
+        </div>
       </div>
 
-      <Band label="What the laboratory knows">
+      {flagship && (
+        <Demo
+          service={flagship.service}
+          title={flagship.title}
+          ask={flagship.ask}
+          usesModel={flagship.usesModel}
+          input={flagship.input}
+        />
+      )}
+
+      <Band label="The practice" count={`${SERVICES.length} services`}>
         <div className="column">
-          {supported.length === 0 ? (
-            <>
-              <p className="lede">Nothing yet.</p>
-              <p className="note">
-                {state.metrics.enginesRun === 0
-                  ? 'No instrument has been executed, so there is nothing to report.'
-                  : `${state.metrics.enginesRun} instruments have run and ${testedAgainstNull.length} measurements have been ` +
-                    'tested against a declared null model. None has exceeded it. On this material, the relations ' +
-                    'computed so far do not produce structure beyond what chance explains.'}
-              </p>
-              <p className="note">
-                That is a result, and it is kept as one. A laboratory that always has an answer is not a sophisticated
-                laboratory; one that represents the boundary of what it knows is.
-              </p>
-            </>
-          ) : (
-            <ul className="index">
-              {supported.slice(0, 6).map((d) => (
-                <li key={d.id}>
-                  <div className="record-head">
-                    <Tag tone="ink">{d.epistemicType.replace(/_/g, ' ')}</Tag>
-                    <span className="spacer" />
-                    <a className="mono plain" href={`/provenance/${d.id}`}>trace →</a>
-                  </div>
-                  {d.statement}
-                </li>
-              ))}
-            </ul>
-          )}
+          <p className="note">
+            Each carries a live demonstration you can run before speaking to anyone, and each states plainly what it
+            is not.
+          </p>
         </div>
+        <ul className="contents" style={{ marginTop: '1.5rem' }}>
+          {SERVICES.map((s) => (
+            <li key={s.slug}>
+              <a href={`/practice/${s.slug}`}>
+                <span className="no">{s.no}</span>
+                <span>
+                  <h3>{s.name}</h3>
+                  <span className="what">{s.dek}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
       </Band>
 
-      <Band label="What it does not know">
+      <Band label="Dispatch">
+        <ul className="contents">
+          <li>
+            <a href="/dispatches/the-result-that-wasnt">
+              <span className="no">01</span>
+              <span>
+                <h3>The result that was not there</h3>
+                <span className="what">
+                  A clustering score of 0.585 at p = 0.002. Textbook significant. It was an artefact, and the thing
+                  that caught it was a corpus built to contain nothing at all.
+                </span>
+                <span className="for">Method · Null models · Figures computed when you open it</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+      </Band>
+
+      <Band label="The evidence">
         <div className="column">
-          <ul className="index">
-            {openFrontier.slice(0, 4).map((f) => (
-              <li key={f.id}>
-                <div className="record-head">
-                  <Tag tone={f.state === 'AWAITING_RESEARCHER' || f.state === 'AWAITING_CAPABILITY' ? 'stamp' : 'quiet'}>
-                    {f.state.replace(/_/g, ' ')}
-                  </Tag>
-                </div>
-                {f.subject}
-              </li>
-            ))}
-          </ul>
-          <p className="note" style={{ marginTop: '1.25rem' }}>
-            {DECLARED_ABSENCES.length} capabilities are declared absent with a stated reason rather than stubbed, so
-            that no process can invent one. <a href="/frontier">The whole frontier →</a>
+          <p className="note">
+            {supported.length === 0
+              ? `A working laboratory, open to inspection: ${state.engines.length} instruments composed, ${state.metrics.enginesRun} executed, ${withNull.length} measurements tested against a declared null model, and zero findings claimed. An instrument that always finds something is broken; this one is built so that a zero is publishable.`
+              : `${supported.length} finding(s) currently exceed their null model, each published with the null used and a written statement of what it does not license.`}
+          </p>
+          <p className="note">
+            <a href="/laboratory">Enter the laboratory →</a>
           </p>
         </div>
       </Band>
 
-      {unverified.length > 0 && (
-        <Band label="Standing caution">
-          <div className="column">
-            <div className="stamp">
-              <span className="stamp-label">Source not verified</span>
-              {unverified.length === 1
-                ? `The corpus ${unverified[0]!.slug} is admitted as an unverified transcription.`
-                : `${unverified.length} admitted corpora are unverified transcriptions.`}{' '}
-              Instruments may compute over such material, but no result resting on it can be promoted to canonical or
-              published until a human researcher verifies the text against a named edition. That gate is enforced in
-              code. <a href="/corpus">The corpus register →</a>
-            </div>
-          </div>
-        </Band>
-      )}
-
       <Band label="Who is visiting">
         <div className="column">
           <p className="note">
-            The laboratory reports the same state to everyone. Choose how you would like it introduced, and it will
-            put a different thing first — or go straight to the records below.
+            The same records, introduced differently. Choose how you would like to be shown around — the figures do
+            not change, only what is put first.
           </p>
         </div>
         <ul className="entries" style={{ marginTop: '1.5rem' }}>
@@ -143,25 +125,11 @@ export default async function FrontDoor() {
         </ul>
       </Band>
 
-      <Band label="Enter the machinery">
-        <ul className="entries">
-          {entries.map(([href, name, what]) => (
-            <li key={href}>
-              <a href={href}>
-                <span className="entry-name">{name}</span>
-                <span className="entry-what">{what}</span>
-                <span className="entry-count">{counts[href]}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </Band>
-
       <div className="colophon" style={{ marginTop: '3.5rem', borderTop: 'none' }}>
         <div className="state-line" style={{ marginTop: 0 }}>
           {state.metrics.events} ledger events · chain {chain.intact ? 'intact' : 'BROKEN'} ·{' '}
           {registry.names().length} capabilities · {state.engines.length} instruments ·{' '}
-          {state.metrics.enginesRun} runs · {supported.length} supported findings
+          {state.metrics.enginesRun} executions · {supported.length} supported findings
           {state.lastEventAt ? ` · last activity ${state.lastEventAt.replace('T', ' ').slice(0, 19)}Z` : ''}
         </div>
       </div>

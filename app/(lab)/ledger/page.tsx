@@ -1,7 +1,7 @@
 /** The ledger: the durable history, and proof it has not been rewritten. §22, §64, §86 */
-import { readState } from '../../lab/runtime';
-import { verifyChain } from '../../lab/ledger/events';
-import { Band, Tag, actorLabel } from '../ui';
+import { readState } from '../../../lab/runtime';
+import { verifyChain } from '../../../lab/ledger/events';
+import { Band, Tag, actorLabel } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 

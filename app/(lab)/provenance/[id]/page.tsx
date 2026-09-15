@@ -1,7 +1,7 @@
 /** Provenance: move backward from any object to the data it rests on. §21, §55, §83 */
-import { readState } from '../../../lab/runtime';
-import { auditProvenance, lineage } from '../../../lab/provenance/provenance';
-import { Band, EpistemicTag, Tag, actorLabel } from '../../ui';
+import { readState } from '../../../../lab/runtime';
+import { auditProvenance, lineage } from '../../../../lab/provenance/provenance';
+import { Band, EpistemicTag, Tag, actorLabel } from '../../../ui';
 
 export const dynamic = 'force-dynamic';
 

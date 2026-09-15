@@ -1,6 +1,6 @@
 /** Findings, and what they are not allowed to mean. §20, §28, §56, §92 */
-import { readState } from '../../lab/runtime';
-import { Band, EpistemicTag, Tag, fmt } from '../ui';
+import { readState } from '../../../lab/runtime';
+import { Band, EpistemicTag, Tag, fmt } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 

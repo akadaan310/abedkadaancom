@@ -4,8 +4,8 @@
  * The laboratory holds research material; it is not identified with any one corpus. This
  * page is the register of what has been admitted and how far each source can be trusted.
  */
-import { readState } from '../../lab/runtime';
-import { Band, Tag } from '../ui';
+import { readState } from '../../../lab/runtime';
+import { Band, Tag } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 

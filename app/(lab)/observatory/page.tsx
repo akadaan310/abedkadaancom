@@ -4,9 +4,9 @@
  * Everything here is read from the ledger. If the laboratory has computed nothing, the
  * page says so rather than filling the space.
  */
-import { readState } from '../../lab/runtime';
-import { verifyChain } from '../../lab/ledger/events';
-import { Band, EpistemicTag, Figure, StatusTag, Tag, actorLabel, fmt } from '../ui';
+import { readState } from '../../../lab/runtime';
+import { verifyChain } from '../../../lab/ledger/events';
+import { Band, EpistemicTag, Figure, StatusTag, Tag, actorLabel, fmt } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 

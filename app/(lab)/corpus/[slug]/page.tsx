@@ -1,7 +1,7 @@
 /** One admitted corpus. §38 (multi-scale), §87 (verification status travels with it). */
 import { notFound } from 'next/navigation';
-import { readState } from '../../../lab/runtime';
-import { Band, Tag } from '../../ui';
+import { readState } from '../../../../lab/runtime';
+import { Band, Tag } from '../../../ui';
 
 export const dynamic = 'force-dynamic';
 

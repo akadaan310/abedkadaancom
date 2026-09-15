@@ -1,8 +1,8 @@
 /** Self-description: what can be computed, on what terms, and what cannot. §66, §89, §90 */
-import { buildRegistry, readState, router } from '../../lab/runtime';
-import { DECLARED_ABSENCES } from '../../lab/capabilities/registry';
-import { ROLES } from '../../lab/nano/roles';
-import { Band, Tag } from '../ui';
+import { buildRegistry, readState, router } from '../../../lab/runtime';
+import { DECLARED_ABSENCES } from '../../../lab/capabilities/registry';
+import { ROLES } from '../../../lab/nano/roles';
+import { Band, Tag } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 

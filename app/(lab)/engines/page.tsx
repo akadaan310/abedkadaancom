@@ -1,6 +1,6 @@
 /** The register of instruments. §17, §84 */
-import { readState } from '../../lab/runtime';
-import { Band, StatusTag, Tag, actorLabel } from '../ui';
+import { readState } from '../../../lab/runtime';
+import { Band, StatusTag, Tag, actorLabel } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 
