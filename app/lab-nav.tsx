@@ -12,6 +12,7 @@ export const LAB_SECTIONS = [
   ['/capabilities', 'Capabilities'],
   ['/corpus', 'Corpus'],
   ['/ledger', 'Ledger'],
+  ['/geometry', 'Geometry'],
 ] as const;
 
 export function LabNav() {
