@@ -8,6 +8,7 @@
 import { readState, buildRegistry } from '../lab/runtime';
 import { DECLARED_ABSENCES } from '../lab/capabilities/registry';
 import { verifyChain } from '../lab/ledger/events';
+import { GUESTS } from './guests';
 import { Band, Tag } from './ui';
 
 export const dynamic = 'force-dynamic';
@@ -121,6 +122,26 @@ export default async function FrontDoor() {
           </div>
         </Band>
       )}
+
+      <Band label="Who is visiting">
+        <div className="column">
+          <p className="note">
+            The laboratory reports the same state to everyone. Choose how you would like it introduced, and it will
+            put a different thing first — or go straight to the records below.
+          </p>
+        </div>
+        <ul className="entries" style={{ marginTop: '1.5rem' }}>
+          {GUESTS.map((g) => (
+            <li key={g.slug}>
+              <a href={`/visit/${g.slug}`}>
+                <span className="entry-name">{g.name}</span>
+                <span className="entry-what">{g.who}</span>
+                <span className="entry-count">→</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Band>
 
       <Band label="Enter the machinery">
         <ul className="entries">
