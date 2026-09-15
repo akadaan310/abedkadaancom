@@ -1,7 +1,7 @@
-/** Provenance explorer. §21, §55, §83 — move backward from a result to the data. */
+/** Provenance: move backward from any object to the data it rests on. §21, §55, §83 */
 import { readState } from '../../../lab/runtime';
-import { lineage, auditProvenance } from '../../../lab/provenance/provenance';
-import { EpistemicBadge, actorLabel } from '../../ui';
+import { auditProvenance, lineage } from '../../../lab/provenance/provenance';
+import { Band, EpistemicTag, Tag, actorLabel } from '../../ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,15 +12,12 @@ export default async function Provenance({ params }: { params: Promise<{ id: str
 
   if (!node) {
     return (
-      <>
-        <h2>Provenance</h2>
-        <div className="panel">
-          <p className="note">
-            No object with id <span className="mono">{id}</span> is in the materialized index. It was never recorded,
-            or it belongs to a different ledger.
-          </p>
-        </div>
-      </>
+      <Band label="Provenance">
+        <p className="note">
+          No object with id <span className="mono">{id}</span> is in the materialized index. It was never recorded,
+          or it belongs to a different ledger.
+        </p>
+      </Band>
     );
   }
 
@@ -33,38 +30,50 @@ export default async function Provenance({ params }: { params: Promise<{ id: str
 
   return (
     <>
-      <h2>Provenance</h2>
-      <div className="row">
-        <h3>{node.label}</h3>
-        <span className="badge b-unresolved">{node.kind}</span>
-        <EpistemicBadge type={node.epistemicType} />
-      </div>
-      <p className="chain">{node.id}</p>
+      <Band label="Provenance">
+        <div className="record-head">
+          <Tag tone="quiet">{node.kind}</Tag>
+          <EpistemicTag type={node.epistemicType} />
+        </div>
+        <div className="column">
+          <h1 className="record-title" style={{ fontSize: '1.3rem', margin: '0.5rem 0 0.4rem' }}>{node.label}</h1>
+          <div className="id">{node.id}</div>
+        </div>
+      </Band>
 
-      <h2>What produced this</h2>
-      <div className="panel">
+      <Band label="What produced this">
         {p ? (
           <>
-            <p className="note">
-              <strong>Creator:</strong> <span className="mono">{actorLabel(p.creator)}</span><br />
-              <strong>When:</strong> <span className="mono">{p.timestamp}</span><br />
-              <strong>From which data:</strong> <span className="mono">{JSON.stringify(p.sources)}</span><br />
-              {p.engineId && <><strong>Engine:</strong> <a className="mono" href={`/engines/${p.engineId}`}>{p.engineId}</a> v{p.engineVersion}<br /></>}
-              <strong>Capability chain:</strong> <span className="mono">{p.derivation.join(' → ') || '—'}</span><br />
-              <strong>Parameters:</strong> <span className="mono">{JSON.stringify(p.configuration)}</span>
-            </p>
+            <div className="scroll">
+              <table>
+                <tbody>
+                  <tr><th style={{ width: '11rem' }}>creator</th><td className="mono">{actorLabel(p.creator)}</td></tr>
+                  <tr><th>when</th><td className="mono">{p.timestamp}</td></tr>
+                  <tr><th>from which data</th><td className="mono">{JSON.stringify(p.sources)}</td></tr>
+                  {p.engineId && (
+                    <tr>
+                      <th>instrument</th>
+                      <td><a className="mono" href={`/engines/${p.engineId}`}>{p.engineId}</a> v{p.engineVersion}</td>
+                    </tr>
+                  )}
+                  <tr><th>capability chain</th><td className="mono">{p.derivation.join(' → ') || '—'}</td></tr>
+                  <tr><th>parameters</th><td className="mono">{JSON.stringify(p.configuration)}</td></tr>
+                </tbody>
+              </table>
+            </div>
+
             {p.models.length > 0 && (
-              <div className="scroll" style={{ marginTop: 10 }}>
+              <div className="scroll" style={{ marginTop: '1.5rem' }}>
                 <table>
                   <thead><tr><th>model</th><th>role</th><th>deterministic</th><th>temp</th><th>prompt digest</th></tr></thead>
                   <tbody>
-                    {p.models.map((m, i) => (
+                    {p.models.map((mu, i) => (
                       <tr key={i}>
-                        <td className="mono">{m.provider}/{m.model}</td>
-                        <td className="mono">{m.role}</td>
-                        <td className="num">{m.deterministic ? 'yes' : 'no'}</td>
-                        <td className="num">{m.temperature ?? '—'}</td>
-                        <td className="chain">{m.promptDigest.slice(0, 20)}…</td>
+                        <td className="mono">{mu.provider}/{mu.model}</td>
+                        <td className="mono">{mu.role}</td>
+                        <td className="num">{mu.deterministic ? 'yes' : 'no'}</td>
+                        <td className="num">{mu.temperature ?? '—'}</td>
+                        <td className="id">{mu.promptDigest.slice(0, 24)}…</td>
                       </tr>
                     ))}
                   </tbody>
@@ -74,36 +83,45 @@ export default async function Provenance({ params }: { params: Promise<{ id: str
             {p.notes && <p className="guard">{p.notes}</p>}
           </>
         ) : (
-          <p className="note">This object carries no provenance record. That is itself a finding, and the auditor flags it.</p>
+          <p className="note">
+            This object carries no provenance record. That is itself a finding, and the auditor reports it.
+          </p>
         )}
-      </div>
+      </Band>
 
-      <h2>Provenance completeness</h2>
-      <div className="panel">
-        <span className={`badge ${audit.complete ? 'b-ok' : 'b-fail'}`}>{audit.complete ? 'complete' : 'incomplete'}</span>
-        {audit.missing.length > 0 && <p className="note" style={{ marginTop: 8 }}>Missing: {audit.missing.join(', ')}</p>}
-        {audit.warnings.map((w, i) => <p className="guard" key={i}>{w}</p>)}
-      </div>
+      <Band label="Completeness">
+        <div className="record-head">
+          <Tag tone={audit.complete ? 'ink' : 'stamp'}>{audit.complete ? 'complete' : 'incomplete'}</Tag>
+        </div>
+        <div className="column" style={{ marginTop: '0.75rem' }}>
+          {audit.missing.length > 0 && <p className="note tight">Missing: {audit.missing.join(', ')}</p>}
+          {audit.warnings.map((w, i) => <p className="guard" key={i}>{w}</p>)}
+          {audit.complete && audit.warnings.length === 0 && (
+            <p className="note">This object can answer what produced it, from which data, and with what parameters.</p>
+          )}
+        </div>
+      </Band>
 
-      <h2>Lineage ({chain.length} objects)</h2>
-      <div className="panel scroll">
-        <table>
-          <thead><tr><th>depth</th><th>object</th><th>kind</th><th>produced by</th></tr></thead>
-          <tbody>
-            {chain.map((step) => {
-              const n = state.index.get(step.id);
-              return (
-                <tr key={step.id}>
-                  <td className="num">{step.depth}</td>
-                  <td><a href={`/provenance/${step.id}`}>{n?.label ?? step.id}</a></td>
-                  <td className="mono" style={{ color: 'var(--muted)' }}>{n?.kind ?? '—'}</td>
-                  <td className="mono" style={{ color: 'var(--dim)' }}>{step.derivation.join(' → ') || '—'}</td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      <Band label="Lineage" count={`${chain.length} objects`}>
+        <div className="scroll">
+          <table>
+            <thead><tr><th>depth</th><th>object</th><th>kind</th><th>produced by</th></tr></thead>
+            <tbody>
+              {chain.map((step) => {
+                const n = state.index.get(step.id);
+                return (
+                  <tr key={step.id}>
+                    <td className="num" style={{ color: 'var(--faint)' }}>{step.depth}</td>
+                    <td><a href={`/provenance/${step.id}`}>{n?.label ?? step.id}</a></td>
+                    <td className="mono" style={{ color: 'var(--muted)' }}>{n?.kind ?? '—'}</td>
+                    <td className="mono" style={{ color: 'var(--faint)' }}>{step.derivation.join(' → ') || '—'}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </Band>
     </>
   );
 }

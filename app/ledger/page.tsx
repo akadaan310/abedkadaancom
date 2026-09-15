@@ -1,7 +1,7 @@
-/** The ledger. §22, §64, §86 — the durable history, and proof it has not been rewritten. */
+/** The ledger: the durable history, and proof it has not been rewritten. §22, §64, §86 */
 import { readState } from '../../lab/runtime';
 import { verifyChain } from '../../lab/ledger/events';
-import { actorLabel } from '../ui';
+import { Band, Tag, actorLabel } from '../ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,55 +13,60 @@ export default async function Ledger() {
 
   return (
     <>
-      <h2>Research ledger</h2>
-      <p className="note">
-        Append-only and hash-chained: each event's hash covers its own content and its predecessor, so altering any
-        past event invalidates every event after it. This is how "AI must not overwrite canonical research state" is
-        enforced structurally rather than by convention — there is no update path at all.
-      </p>
-
-      <div className="panel">
-        <div className="row">
-          <h3>{state.events.length} events</h3>
-          <span className={`badge ${chain.intact ? 'b-ok' : 'b-fail'}`}>{chain.intact ? 'chain intact' : 'chain broken'}</span>
-        </div>
-        {chain.problems.map((p, i) => <p className="guard" key={i} style={{ color: 'var(--fail)' }}>{p}</p>)}
-        {state.events.length > 0 && (
-          <p className="chain" style={{ marginTop: 10 }}>
-            head: {state.events[state.events.length - 1]!.hash}
+      <Band label="Ledger" count={`${state.events.length} events`}>
+        <div className="column">
+          <p className="lede">Append-only, and hash-chained.</p>
+          <p className="note">
+            Each event's hash covers its own content and its predecessor's hash, so altering any past event
+            invalidates every event after it. This is how <em>AI must not overwrite canonical research state</em> is
+            enforced structurally rather than by convention: there is no update path at all. Correcting a mistake means
+            appending a correction, not editing the original. The mistake stays visible.
           </p>
+        </div>
+        <div className="record-head" style={{ marginTop: '1.5rem' }}>
+          <Tag tone={chain.intact ? 'ink' : 'stamp'}>{chain.intact ? 'chain intact' : 'chain broken'}</Tag>
+          <span className="spacer" />
+          <span className="num" style={{ color: 'var(--faint)', fontSize: '0.72rem' }}>{chain.checked} events verified</span>
+        </div>
+        {chain.problems.map((p, i) => <p className="guard" key={i} style={{ color: 'var(--stamp)' }}>{p}</p>)}
+        {state.events.length > 0 && (
+          <div className="chain-line" style={{ marginTop: '0.75rem' }}>
+            head · {state.events[state.events.length - 1]!.hash}
+          </div>
         )}
-      </div>
+      </Band>
 
-      <h2>Event types recorded</h2>
-      <div className="panel scroll">
-        <table>
-          <thead><tr><th>type</th><th>count</th></tr></thead>
-          <tbody>
-            {[...counts.entries()].sort((a, b) => b[1] - a[1]).map(([t, n]) => (
-              <tr key={t}><td className="mono">{t}</td><td className="num">{n}</td></tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Band label="Event types recorded" count={`${counts.size}`}>
+        <div className="scroll">
+          <table>
+            <thead><tr><th>type</th><th>count</th></tr></thead>
+            <tbody>
+              {[...counts.entries()].sort((a, b) => b[1] - a[1]).map(([t, n]) => (
+                <tr key={t}><td className="mono">{t}</td><td className="num">{n}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Band>
 
-      <h2>Full history</h2>
-      <div className="panel scroll">
-        <table>
-          <thead><tr><th>#</th><th>timestamp</th><th>type</th><th>actor</th><th>hash</th></tr></thead>
-          <tbody>
-            {[...state.events].reverse().map((e) => (
-              <tr key={e.id}>
-                <td className="num">{e.seq}</td>
-                <td className="num">{e.timestamp.replace('T', ' ').slice(0, 19)}</td>
-                <td className="mono">{e.payload.type}</td>
-                <td className="mono" style={{ color: 'var(--muted)' }}>{actorLabel(e.actor)}</td>
-                <td className="chain">{e.hash.slice(0, 16)}…</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Band label="Full history">
+        <div className="scroll">
+          <table>
+            <thead><tr><th>#</th><th>timestamp</th><th>type</th><th>actor</th><th>hash</th></tr></thead>
+            <tbody>
+              {[...state.events].reverse().map((e) => (
+                <tr key={e.id}>
+                  <td className="num" style={{ color: 'var(--faint)' }}>{e.seq}</td>
+                  <td className="num">{e.timestamp.replace('T', ' ').slice(0, 19)}</td>
+                  <td className="mono">{e.payload.type}</td>
+                  <td className="mono" style={{ color: 'var(--muted)' }}>{actorLabel(e.actor)}</td>
+                  <td className="id">{e.hash.slice(0, 16)}…</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Band>
     </>
   );
 }

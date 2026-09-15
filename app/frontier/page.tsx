@@ -1,8 +1,8 @@
-/** The research frontier. §46, §56, §75, §90 */
+/** The frontier: what has not been done, and what cannot be. §46, §56, §75, §90 */
 import { readState } from '../../lab/runtime';
 import { rankFrontier, utility } from '../../lab/frontier/frontier';
 import { DECLARED_ABSENCES } from '../../lab/capabilities/registry';
-import { fmt } from '../ui';
+import { Band, Tag, fmt } from '../ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,52 +14,68 @@ export default async function Frontier() {
 
   return (
     <>
-      <h2>Research frontier</h2>
-      <p className="note">
-        What the laboratory knows it has not done. Items are ranked by expected information gain × research priority ×
-        novelty ÷ cost, so the laboratory can say "interesting but expensive" and defer rather than spending
-        indiscriminately.
-      </p>
-
-      <h2>Actionable now ({ranked.length})</h2>
-      <div className="panel scroll">
-        <table>
-          <thead><tr><th>subject</th><th>kind</th><th>state</th><th>cost</th><th>utility</th></tr></thead>
-          <tbody>
-            {ranked.map((f) => (
-              <tr key={f.id}>
-                <td>{f.subject}<div className="note" style={{ fontSize: 12.5, marginTop: 3 }}>{f.reason}</div></td>
-                <td className="mono">{f.itemKind}</td>
-                <td><span className="badge b-unresolved">{f.state.replace(/_/g, ' ')}</span></td>
-                <td className="num">{f.costEstimate}</td>
-                <td className="num">{fmt(utility(f), 4)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <h2>Blocked ({blocked.length})</h2>
-      <p className="note">Waiting on a capability the laboratory does not have, or on the researcher. Not forgotten.</p>
-      <ul className="plain">
-        {blocked.map((f) => (
-          <li key={f.id} className="panel" style={{ marginBottom: 8 }}>
-            <div className="row"><span className="badge b-unresolved">{f.state.replace(/_/g, ' ')}</span><strong>{f.subject}</strong></div>
-            <p className="note" style={{ marginTop: 6 }}>{f.reason}</p>
-          </li>
-        ))}
-      </ul>
-
-      <h2>What this laboratory cannot currently do</h2>
-      <p className="note">
-        Declared absences, published so that no process can invent a capability that does not exist. (§90)
-      </p>
-      {DECLARED_ABSENCES.map((a) => (
-        <div className="panel" key={a.name}>
-          <div className="row"><h3 className="mono">{a.name}</h3><span className="badge b-fail">{a.reason.replace(/_/g, ' ')}</span></div>
-          <p className="note" style={{ marginTop: 6 }}>{a.detail}</p>
+      <Band label="Frontier">
+        <div className="column">
+          <p className="lede">What the laboratory knows it has not done.</p>
+          <p className="note">
+            Items are ranked by expected information gain × research priority × novelty ÷ cost, so the laboratory can
+            say <em>interesting but expensive</em> and defer, rather than spending indiscriminately.
+          </p>
         </div>
-      ))}
+      </Band>
+
+      <Band label="Actionable now" count={`${ranked.length}`}>
+        {ranked.length === 0 && <p className="note">Nothing is actionable: every item is blocked or closed.</p>}
+        {ranked.map((f) => (
+          <article className="record" key={f.id}>
+            <div className="record-head">
+              <Tag tone="quiet">{f.itemKind.replace(/_/g, ' ')}</Tag>
+              <Tag tone="quiet">{f.state.replace(/_/g, ' ')}</Tag>
+              <span className="spacer" />
+              <span className="num" style={{ color: 'var(--faint)', fontSize: '0.72rem' }}>
+                cost {f.costEstimate} · utility {fmt(utility(f), 4)}
+              </span>
+            </div>
+            <h3 className="record-title">{f.subject}</h3>
+            <p className="note tight" style={{ marginTop: '0.4rem' }}>{f.reason}</p>
+          </article>
+        ))}
+      </Band>
+
+      <Band label="Blocked" count={`${blocked.length}`}>
+        <div className="column">
+          <p className="note">Waiting on a capability the laboratory does not have, or on the researcher. Not forgotten.</p>
+        </div>
+        <div style={{ marginTop: '1.5rem' }}>
+          {blocked.map((f) => (
+            <article className="record" key={f.id}>
+              <div className="record-head"><Tag tone="stamp">{f.state.replace(/_/g, ' ')}</Tag></div>
+              <h3 className="record-title">{f.subject}</h3>
+              <p className="note tight" style={{ marginTop: '0.4rem' }}>{f.reason}</p>
+            </article>
+          ))}
+        </div>
+      </Band>
+
+      <Band label="What this laboratory cannot do" count={`${DECLARED_ABSENCES.length}`}>
+        <div className="column">
+          <p className="note">
+            Declared absences, published so that no process can invent a capability that does not exist.
+          </p>
+        </div>
+        <div style={{ marginTop: '1.5rem' }}>
+          {DECLARED_ABSENCES.map((a) => (
+            <article className="record" key={a.name}>
+              <div className="record-head">
+                <Tag tone="stamp">{a.reason.replace(/_/g, ' ')}</Tag>
+                <span className="spacer" />
+                <span className="mono" style={{ color: 'var(--faint)' }}>{a.name}</span>
+              </div>
+              <p className="note tight">{a.detail}</p>
+            </article>
+          ))}
+        </div>
+      </Band>
     </>
   );
 }

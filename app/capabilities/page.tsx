@@ -1,7 +1,8 @@
-/** Self-description. §66, §89 — what the laboratory can do, and what it declares it cannot. */
+/** Self-description: what can be computed, on what terms, and what cannot. §66, §89, §90 */
 import { buildRegistry, readState, router } from '../../lab/runtime';
 import { DECLARED_ABSENCES } from '../../lab/capabilities/registry';
 import { ROLES } from '../../lab/nano/roles';
+import { Band, Tag } from '../ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,96 +11,122 @@ export default async function Capabilities() {
   const state = await readState();
   const usage = state.metrics.capabilityUsage;
   const providers = router().describe();
+  const transforms = registry.all().filter((c) => c.transform);
 
   return (
     <>
-      <h2>Capabilities</h2>
-      <p className="note">
-        Every computation the laboratory can perform, with its cost and how often engines have used it. A proposal
-        naming anything not on this list is rejected before it runs.
-      </p>
-
-      <div className="panel scroll">
-        <table>
-          <thead><tr><th>capability</th><th>consumes → produces</th><th>cost</th><th>used</th></tr></thead>
-          <tbody>
-            {registry.all().map((c) => (
-              <tr key={c.name}>
-                <td>
-                  <span className="mono">{c.name}</span>
-                  <div className="note" style={{ fontSize: 12.5, marginTop: 3 }}>{c.purpose}</div>
-                  {c.transform && (
-                    <div className="note" style={{ fontSize: 12.5, marginTop: 4, color: 'var(--dim)' }}>
-                      declares <strong>{c.transform.invertibility}</strong> · discards: {c.transform.discards.join(', ') || 'nothing'}
-                    </div>
-                  )}
-                </td>
-                <td className="mono" style={{ color: 'var(--muted)' }}>{c.inputs.join(', ') || '—'} → {c.output}</td>
-                <td className="num">{c.costUnits}</td>
-                <td className="num">{usage[c.name] ?? 0}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <h2>Transformations and their information loss</h2>
-      <p className="note">
-        §13 requires every transformation to declare what it preserves and discards, and requires those claims to be
-        testable. The invertibility claims below are checked by the test suite, not taken on trust.
-      </p>
-      {registry.all().filter((c) => c.transform).map((c) => (
-        <div className="panel" key={`t-${c.name}`}>
-          <div className="row">
-            <h3 className="mono">{c.name}</h3>
-            <span className={`badge ${c.transform!.invertibility === 'INVERTIBLE' ? 'b-ok' : 'b-unresolved'}`}>
-              {c.transform!.invertibility}
-            </span>
-          </div>
-          <p className="note" style={{ marginTop: 6 }}>
-            <strong>Preserves:</strong> {c.transform!.preserves.join(', ')}<br />
-            <strong>Discards:</strong> {c.transform!.discards.join(', ') || 'nothing'}
-          </p>
-          {c.transform!.conditions.map((cond, i) => <p className="guard" key={i}>{cond}</p>)}
-        </div>
-      ))}
-
-      <h2>Nano-LLM roles</h2>
-      <p className="note">
-        Roles are contracts, not models. Each may only request certain operations and may only claim certain epistemic
-        types; a proposal violating its role is recorded as a violation rather than acted on.
-      </p>
-      {ROLES.map((r) => (
-        <div className="panel" key={r.name}>
-          <h3 className="mono">{r.name}</h3>
-          <p className="note" style={{ marginTop: 4 }}>{r.capability}</p>
-          <p className="note" style={{ color: 'var(--dim)' }}>
-            may request: {r.allowedOps.join(', ') || '(nothing)'} · may claim: {r.permittedEpistemicTypes.join(', ')} · tier: {r.preferredTier}
+      <Band label="Capabilities" count={`${registry.names().length} registered`}>
+        <div className="column">
+          <p className="lede">Every computation this laboratory can perform.</p>
+          <p className="note">
+            A proposal naming anything not on this list is rejected before it runs. This is the register an agent
+            reads to find out what it may actually ask for, rather than inventing a tool that does not exist.
           </p>
         </div>
-      ))}
-
-      <h2>Model providers</h2>
-      <p className="note">
-        The architecture does not depend on any one provider. This is what is actually configured right now.
-      </p>
-      {providers.map((p) => (
-        <div className="panel" key={p.name}>
-          <div className="row">
-            <h3 className="mono">{p.name}</h3>
-            <span className={`badge ${p.deterministic ? 'b-ok' : 'b-ai'}`}>{p.deterministic ? 'deterministic' : 'stochastic'}</span>
-          </div>
-          <p className="note" style={{ marginTop: 6 }}>{p.description}</p>
+        <div className="scroll" style={{ marginTop: '1.75rem' }}>
+          <table>
+            <thead><tr><th>capability</th><th>consumes → produces</th><th>cost</th><th>used</th></tr></thead>
+            <tbody>
+              {registry.all().map((c) => (
+                <tr key={c.name}>
+                  <td>
+                    <span className="mono">{c.name}</span>
+                    <div className="note tight" style={{ fontSize: '0.84rem', marginTop: '0.25rem' }}>{c.purpose}</div>
+                  </td>
+                  <td className="mono" style={{ color: 'var(--muted)', fontSize: '0.74rem' }}>
+                    {c.inputs.join(', ') || '—'} → {c.output}
+                  </td>
+                  <td className="num">{c.costUnits}</td>
+                  <td className="num">{usage[c.name] ?? 0}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      ))}
+      </Band>
 
-      <h2>Declared absences</h2>
-      {DECLARED_ABSENCES.map((a) => (
-        <div className="panel" key={a.name}>
-          <div className="row"><h3 className="mono">{a.name}</h3><span className="badge b-fail">{a.reason.replace(/_/g, ' ')}</span></div>
-          <p className="note" style={{ marginTop: 6 }}>{a.detail}</p>
+      <Band label="Transformations and their information loss" count={`${transforms.length}`}>
+        <div className="column">
+          <p className="note">
+            Every transformation declares what it preserves, what it discards, and whether it is reversible. Those
+            declarations are checked by the test suite, not taken on trust.
+          </p>
         </div>
-      ))}
+        <div style={{ marginTop: '1.5rem' }}>
+          {transforms.map((c) => (
+            <article className="record" key={c.name}>
+              <div className="record-head">
+                <Tag tone={c.transform!.invertibility === 'INVERTIBLE' ? 'ink' : 'quiet'}>{c.transform!.invertibility}</Tag>
+                <span className="spacer" />
+                <span className="mono" style={{ color: 'var(--faint)' }}>{c.name}</span>
+              </div>
+              <p className="note tight"><strong>Preserves.</strong> {c.transform!.preserves.join(', ')}</p>
+              <p className="note tight"><strong>Discards.</strong> {c.transform!.discards.join(', ') || 'nothing'}</p>
+              {c.transform!.conditions.map((cond, i) => <p className="guard" key={i}>{cond}</p>)}
+            </article>
+          ))}
+        </div>
+      </Band>
+
+      <Band label="Roles" count={`${ROLES.length}`}>
+        <div className="column">
+          <p className="note">
+            Roles are contracts, not models. Each may request only certain operations and claim only certain kinds of
+            statement; a proposal that violates its role is recorded as a violation rather than acted on.
+          </p>
+        </div>
+        <div style={{ marginTop: '1.5rem' }}>
+          {ROLES.map((r) => (
+            <article className="record" key={r.name}>
+              <div className="record-head">
+                <span className="mono" style={{ letterSpacing: '0.08em' }}>{r.name}</span>
+                <span className="spacer" />
+                <Tag tone="quiet">{r.preferredTier}</Tag>
+              </div>
+              <p className="note tight">{r.capability}</p>
+              <div className="record-meta">may request: {r.allowedOps.join(', ') || '(nothing)'}</div>
+              <div className="record-meta">may claim: {r.permittedEpistemicTypes.join(', ')}</div>
+            </article>
+          ))}
+        </div>
+      </Band>
+
+      <Band label="Model providers" count={`${providers.length}`}>
+        <div className="column">
+          <p className="note">The architecture depends on no single provider. This is what is configured right now.</p>
+        </div>
+        <div style={{ marginTop: '1.5rem' }}>
+          {providers.map((p) => (
+            <article className="record" key={p.name}>
+              <div className="record-head">
+                <span className="mono">{p.name}</span>
+                <Tag tone="quiet">{p.deterministic ? 'deterministic' : 'stochastic'}</Tag>
+              </div>
+              <p className="note tight">{p.description}</p>
+            </article>
+          ))}
+        </div>
+      </Band>
+
+      <Band label="Declared absent" count={`${DECLARED_ABSENCES.length}`}>
+        <div className="column">
+          <p className="note">
+            Published with a reason rather than stubbed, so that nothing can claim a capability that does not exist.
+          </p>
+        </div>
+        <div style={{ marginTop: '1.5rem' }}>
+          {DECLARED_ABSENCES.map((a) => (
+            <article className="record" key={a.name}>
+              <div className="record-head">
+                <Tag tone="stamp">{a.reason.replace(/_/g, ' ')}</Tag>
+                <span className="spacer" />
+                <span className="mono" style={{ color: 'var(--faint)' }}>{a.name}</span>
+              </div>
+              <p className="note tight">{a.detail}</p>
+            </article>
+          ))}
+        </div>
+      </Band>
     </>
   );
 }
