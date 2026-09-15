@@ -82,6 +82,29 @@ rather than from config, so the null cannot drift away from what actually ran. T
 graph mathematics in `lab/capabilities/graph.ts` is used for both the observed statistic
 and the null draws for the same reason (§20).
 
+## The public surface
+
+`app/` is a publication over the laboratory, in three parts. The **practice** (`/practice`)
+sells instruments; the **arcade** (`/arcade`) gives prompts away; the **laboratory**
+(`/laboratory` and the records beneath it) is the evidence for both. A route group,
+`app/(lab)/`, adds the records' secondary navigation without changing any URL.
+
+Guest entrances (`/visit/[guest]`) implement §43: many worlds from one research state.
+An entrance changes the order and the register in which the laboratory introduces itself,
+and is forbidden from changing a figure. Each reads the same live ledger and says so.
+
+## Demonstrations and the arcade
+
+`lab/demo/` runs ten demonstrations, one per service. Six are pure computation; four call
+a model and then check what came back — and the check is what is displayed. `lab/arcade/`
+holds twelve prompts and a runner that accepts either this site's models or a key the
+visitor supplies for a single call.
+
+Both are public endpoints that spend money, so `lab/demo/guard.ts` bounds input, rate
+limits per address, and caps model-backed calls per day. Those counters live in process
+memory, so on a serverless runtime each instance keeps its own and the ceiling is
+approximate — said here rather than implied to be exact.
+
 ## Runtime
 
 `lab/runtime.ts` is the single assembly point. On a read-only serverless filesystem the

@@ -8,6 +8,7 @@
 import { readState, buildRegistry } from '../lab/runtime';
 import { verifyChain } from '../lab/ledger/events';
 import { demoFor } from '../lab/demo';
+import { PROGRAMS } from '../lab/arcade/programs';
 import { SERVICES } from './services';
 import { GUESTS } from './guests';
 import { Demo } from './demo';
@@ -36,6 +37,7 @@ export default async function Cover() {
         </p>
         <div className="byline">
           <span>{SERVICES.length} services</span>
+          <span>{PROGRAMS.length} free programs</span>
           <span>{state.engines.length} instruments built</span>
           <span>{supported.length} findings claimed</span>
           <span>Ledger {chain.intact ? 'intact' : 'broken'}</span>
@@ -71,6 +73,39 @@ export default async function Cover() {
               </a>
             </li>
           ))}
+        </ul>
+      </Band>
+
+      <Band label="Free to take" count={`${PROGRAMS.length} programs`}>
+        <div className="column">
+          <p className="note">
+            The <a href="/arcade">LLM Arcade</a> is a catalogue of programmable prompts that turn any model into a
+            specific instrument — a game where you hunt the fatal flaw in a plausible finding, a reviewer that attacks
+            your claim and scores which defences held, a contract that stops a model overclaiming. Each prompt is
+            printed in full and costs nothing. Run them here, or take them and go.
+          </p>
+        </div>
+        <ul className="contents" style={{ marginTop: '1.5rem' }}>
+          {PROGRAMS.slice(0, 4).map((p) => (
+            <li key={p.slug}>
+              <a href={`/arcade/${p.slug}`}>
+                <span className="no">{p.category === 'GAME' ? '▶' : p.category === 'INSTRUMENT' ? '⊟' : '§'}</span>
+                <span>
+                  <h3>{p.name}</h3>
+                  <span className="what">{p.kicker}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+          <li>
+            <a href="/arcade">
+              <span className="no">—</span>
+              <span>
+                <h3>The whole catalogue</h3>
+                <span className="what">All {PROGRAMS.length} programs, and SDK access for developers.</span>
+              </span>
+            </a>
+          </li>
         </ul>
       </Band>
 

@@ -1,30 +1,46 @@
 # abedkadaan.com
 
-A computational research laboratory in which bounded AI processes observe research state,
-propose instruments, and have those instruments **computed, measured and challenged**
-before anything counts as a result.
+**Abed Kadaan — Living Research Laboratory.** A practice in computational
+intelligence, a catalogue of free programmable prompts, and a working research
+laboratory that backs both.
 
-The website is not a report about the research. It is the laboratory, rendered.
-
-Built from [`SPEC.md`](./SPEC.md) — the Meta-Intelligence Operating Constitution — with no
-prior codebase, SDK or framework assumed (§59). Section references throughout the source
-(`§7`, `§20`, `§90` …) point back to that document.
+The site is a publication, not a dashboard. Everything it reports was computed by
+code in this repository, and where the laboratory does not know something, it says so.
 
 ---
+
+## Three surfaces
+
+**The practice** — ten services, led by *Time-Durable Communication*: recovering what
+a record actually encodes, and building records a stranger can verify decades later.
+Each service states what it is not, and carries a live demonstration you can run
+before speaking to anyone.
+
+**The arcade** — twelve programmable prompts, given away. Games that make you hunt the
+fatal flaw in a plausible finding; instruments that sort a decision into what is
+established, inferred, assumed and unknown; contracts that stop a model overclaiming.
+Every prompt is printed in full. Run them on this site's models or your own key.
+SDK-level access for developers: **akadaan310@gmail.com**.
+
+**The laboratory** — a running system that proposes its own instruments, computes them,
+tests them against chance, attacks its own results, and records the failures.
+Built from [`SPEC.md`](./SPEC.md), the Meta-Intelligence Operating Constitution, with no
+prior codebase or SDK assumed (§59). Section references throughout the source point back
+to it.
 
 ## The loop
 
 ```
 research state
-   → observe      a bounded process reads the frontier and the capability registry
+   → observe      a bounded process reads the frontier and the capability register
    → propose      it emits a schema-validated proposal, never a conclusion
-   → compose      the proposal becomes an Engine, type-checked against the registry
+   → compose      the proposal becomes an instrument, type-checked against the register
    → audit        provenance, null model and hidden assumptions are inspected
-   → compute      the Engine executes over versioned source data with a recorded seed
+   → compute      the instrument executes over versioned material with a recorded seed
    → measure      statistics are compared against a declared null model
-   → challenge    a counterexample Engine attacks the result
+   → challenge    a counterexample instrument attacks the result
    → record       everything, including failure, is appended to a hash-chained ledger
-   → expose       this website
+   → expose       this site
    → observe again
 ```
 
@@ -32,43 +48,61 @@ research state
 
 ```bash
 npm install
-npm run lab:seed     # admit the corpus, open the first frontier items
-npm run lab:tick 3   # run three turns of the loop
-npm run lab:status   # what the laboratory can say about itself
-npm run dev          # the laboratory, rendered, at http://localhost:3000
-npm test             # the epistemic test suite
+cp .env.example .env.local   # optional: add model provider keys
+npm run lab:seed             # admit the corpus, open the first frontier items
+npm run lab:tick 3           # run three turns of the loop
+npm run lab:status           # what the laboratory can say about itself
+npm run dev                  # the site at http://localhost:3000
+npm test                     # 47 tests
 ```
 
-No API key is required. With `OPENROUTER_API_KEY` set, Nano-LLM roles route to models
-through OpenRouter (§23, §73); without it the loop runs on a deterministic offline
-proposer that is labelled `local-heuristic` everywhere it appears and never claims to be
-a language model (§57).
+No API key is required. With keys present, the loop and the demonstrations route to
+real models; without them, the loop runs on a deterministic offline proposer labelled
+`local-heuristic` everywhere it appears, which never claims to be a model (§57).
 
-## What is actually here
+## Model providers
+
+One HTTP layer for any OpenAI-compatible endpoint (`lab/models/providers.ts`), tried in
+order, recording which one served and which failed. No vendor is privileged; model
+identity is recorded for provenance and never confers authority.
+
+| provider | env | status on this deployment |
+|---|---|---|
+| Groq | `GROQ_API_KEY` | reachable |
+| Mistral | `MISTRAL_API_KEY` | reachable |
+| OpenRouter | `OPENROUTER_API_KEY` | reachable |
+| Cerebras | `CEREBRAS_API_KEY` | configured, no quota — returns `payment_required`, shown rather than hidden |
+
+Adding a provider is a row in that table.
+
+## Layout
 
 | Layer | Where | What it does |
 |---|---|---|
-| Ontology | `lab/ontology/` | Corpus, Locus, Observable, Relation, Structure, Embedding, Measurement, Engine, Experiment (§12); epistemic types and lifecycles (§15, §28) |
-| Provenance | `lab/provenance/` | Machine-readable ancestry, completeness audit, lineage walk (§21, §65) |
-| Ledger | `lab/ledger/` | Append-only hash-chained events, projection to state, materialized index (§22, §64) |
-| Capabilities | `lab/capabilities/` | 21 real computations: Arabic transforms, observables, typed relations, community detection, MDS embedding, permutation and rewiring null models, challenge instruments (§13, §14, §16, §20, §66) |
-| Engines | `lab/engine/` | Composition with static type-checking, execution, auditor, promotion gate (§7, §61, §67, §69) |
+| Ontology | `lab/ontology/` | Computational primitives (§12); epistemic types and lifecycles (§15, §28) |
+| Provenance | `lab/provenance/` | Machine-readable ancestry, completeness audit, lineage (§21, §65) |
+| Ledger | `lab/ledger/` | Append-only hash-chained events, projection, materialized index (§22, §64) |
+| Capabilities | `lab/capabilities/` | 21 real computations: Arabic transforms, observables, typed relations, community detection, MDS embedding, permutation and rewiring null models, challenge instruments |
+| Engines | `lab/engine/` | Composition with static type-checking, execution, auditor, promotion gate (§7, §61, §69) |
 | Nano-LLMs | `lab/nano/` | Role contracts, structured proposals, provider-agnostic routing (§5, §23, §62) |
+| Models | `lab/models/` | The shared provider population |
+| Arcade | `lab/arcade/` | The twelve programs and their runner |
+| Demos | `lab/demo/` | Ten live service demonstrations, with spending guards |
 | Frontier | `lab/frontier/` | Research economy, cost-aware ranking (§46, §75, §99) |
 | Loop | `lab/loop/` | One bounded turn of the continuous loop (§24, §44) |
-| Site | `app/` | Observatory, engines, findings, frontier, capabilities, ledger, corpus, provenance explorer |
+| Site | `app/` | Cover, practice, arcade, dispatches, laboratory records |
 
-## Two things this laboratory refuses to do
+## Two things this system refuses to do
 
-**It will not let AI conclude anything.** A Nano-LLM may author `AI_PROPOSAL`,
+**It will not let AI conclude anything.** A model process may author `AI_PROPOSAL`,
 `AI_HYPOTHESIS`, `AI_OBSERVATION`, `AI_INTERPRETATION` or `AI_COUNTEREXAMPLE`. It cannot
-author `COMPUTED`, `DERIVED` or `INFERENCE` — those require an executed Engine — and it
-cannot change an Engine's status at all. The check is a throwing guard in the data model
-(`lab/ontology/epistemic.ts`), not a naming convention.
+author `COMPUTED`, `DERIVED` or `INFERENCE` — those require an executed instrument — and
+it cannot change an instrument's status at all. The check is a throwing guard in the data
+model (`lab/ontology/epistemic.ts`), not a naming convention.
 
 **It will not publish from an unverified source.** The working corpus is admitted as
-`UNVERIFIED_TRANSCRIPTION`. Engines may compute over it; the promotion gate refuses to
-make any result resting on it `CANONICAL` until a human researcher verifies the text
+`UNVERIFIED_TRANSCRIPTION`. Instruments may compute over it; the promotion gate refuses
+to make any result resting on it `CANONICAL` until a human researcher verifies the text
 against a named edition (`lab/engine/promote.ts`). See [`lab/corpus/README.md`](./lab/corpus/README.md).
 
 ## A worked example of why this matters
@@ -84,21 +118,28 @@ separates the cases cleanly:
 
 | corpus | planted structure | p | exceeds null |
 |---|---|---|---|
-| synthetic, cohesion 0.95 | yes | 0.013 | **yes** |
-| synthetic, cohesion 0.0 | none | 0.768 | no |
-| quran-short-surahs | unknown | 0.152 | no |
+| synthetic, cohesion 0.95 | yes | ~0.01 | **yes** |
+| synthetic, cohesion 0.0 | none | ~0.77 | no |
+| quran-short-surahs | unknown | ~0.15 | no |
 
-Both null models are kept and displayed, the inadequate one explicitly labelled
-`CONTROL, NOT A FINDING`, because choosing a null model is itself a research decision that
-a reader is entitled to inspect (§20, §54). The synthetic controls are in
-`tests/nullmodels.test.ts`; the negative control is the decisive test.
+Both null models are kept and displayed, the inadequate one labelled
+`CONTROL, NOT A FINDING`. The full account is at `/dispatches/the-result-that-wasnt`,
+where those figures are computed when the page is opened.
 
-**The current honest state of this laboratory: zero supported findings.** On this corpus,
-no computed relation has yet produced structure exceeding its null model. That is a
-result, and it is displayed as one.
+**The current honest state: zero supported findings.** No computed relation on this
+corpus exceeds its null model, and the site says so on its front page.
+
+## Security
+
+Provider keys live in `.env.local`, which is gitignored and read server-side only. The
+demonstration and arcade endpoints are public and spend money, so input is bounded,
+requests are rate-limited per address, and model-backed calls have a daily ceiling. The
+counters are per process, which is approximate on a serverless runtime — stated in the
+code rather than implied to be stronger. A key supplied by a visitor is forwarded for
+that single call and never stored or logged.
 
 ## Documents
 
 - [`SPEC.md`](./SPEC.md) — the constitution this was built from
 - [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) — how the layers fit together
-- [`docs/CONFORMANCE.md`](./docs/CONFORMANCE.md) — section-by-section: what is implemented, what is deliberately absent
+- [`docs/CONFORMANCE.md`](./docs/CONFORMANCE.md) — section by section: implemented, partial, deliberately absent
