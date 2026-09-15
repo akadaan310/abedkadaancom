@@ -6,7 +6,8 @@
  * the promotion gate in `lab/engine/promote.ts` refuses to make anything canonical that
  * rests on an unverified transcription.
  */
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { contentId } from '../ontology/canonical';
 import { rng, seedFrom, shuffled } from '../capabilities/rng';
 import type { Corpus, Locus, SourceVerification, Word } from '../ontology/types';
@@ -76,6 +77,27 @@ export async function loadCorpusFile(path: string): Promise<Corpus> {
 }
 
 /** Material whose findings may never be published without a human verifying the source. §29, §95 */
+/**
+ * Load every corpus file in a directory, in a stable order.
+ *
+ * The laboratory is a register that holds research material; it is not identified with
+ * any one corpus. Adding a file here admits a corpus, and nothing else needs to change.
+ */
+export async function loadCorpusDirectory(dir: string): Promise<Corpus[]> {
+  let names: string[];
+  try {
+    names = (await readdir(dir)).filter((n) => n.endsWith('.json')).sort();
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code === 'ENOENT') return [];
+    throw err;
+  }
+  const corpora: Corpus[] = [];
+  for (const name of names) {
+    corpora.push(await loadCorpusFile(join(dir, name)));
+  }
+  return corpora;
+}
+
 export function requiresVerificationBeforePublication(corpus: Corpus): boolean {
   return corpus.sourceVerification !== 'VERIFIED_AGAINST_EDITION';
 }

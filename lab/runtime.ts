@@ -7,12 +7,13 @@ import { join } from 'node:path';
 import { FileLedgerStore, type LedgerStore } from './ledger/store';
 import { project, type LabState } from './ledger/projection';
 import { buildRegistry } from './capabilities/registry';
-import { loadCorpusFile } from './corpus/loader';
+import { loadCorpusDirectory } from './corpus/loader';
 import { NanoRouter } from './nano/router';
 import type { Corpus } from './ontology/types';
 
 export const LEDGER_PATH = process.env['LAB_LEDGER_PATH'] ?? join(process.cwd(), 'ledger', 'events.jsonl');
-export const CORPUS_PATH = join(process.cwd(), 'lab', 'corpus', 'data', 'quran-short-surahs.json');
+/** Every corpus file in this directory is admitted research material. §1 */
+export const CORPUS_DIR = process.env['LAB_CORPUS_DIR'] ?? join(process.cwd(), 'lab', 'corpus', 'data');
 
 /** A serverless runtime gives a read-only filesystem; the store reports that honestly. §74, §90 */
 export function ledgerStore(): LedgerStore {
@@ -21,7 +22,7 @@ export function ledgerStore(): LedgerStore {
 }
 
 export async function loadCorpora(): Promise<Corpus[]> {
-  return [await loadCorpusFile(CORPUS_PATH)];
+  return loadCorpusDirectory(CORPUS_DIR);
 }
 
 export async function readState(): Promise<LabState> {
