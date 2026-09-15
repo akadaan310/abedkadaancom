@@ -1,8 +1,8 @@
 import { typographicData } from '../../../../lab/geometry/compute';
-import { Band } from '../../../ui';
 import { Typographic } from '../_lib/Typographic';
 import { GeometryMeta } from '../_lib/Meta';
 import { GeometrySwitcher } from '../_lib/Switcher';
+import { Tile, TileRow } from '../_lib/Tile';
 import { DEFAULT_LENS, copyFor, isLensSlug } from '../_lib/lenses';
 
 export const dynamic = 'force-dynamic';
@@ -15,33 +15,25 @@ export default async function Geometry05({ searchParams }: { searchParams: Promi
   return (
     <>
       <GeometrySwitcher />
-      <Band label="Geometry 05 · Typographic">
-        <div className="column">
-          <p className="lede">The corpus's own measured extent, as geometry.</p>
-          <p className="note">
-            No embedding here — each block is one passage, sized by its own token count and shaded by its own
-            letter entropy. The geometry is the typography, measured rather than designed.
-          </p>
-        </div>
-      </Band>
+      <TileRow wrap={false}>
+        <Tile wide label="05 · typographic" value="No embedding here — each tile is one passage, sized by its own token count and shaded by its own letter entropy." />
+      </TileRow>
 
       {!data ? (
-        <Band label="Unavailable"><p className="note">No corpus is admitted. Run <span className="mono">npm run lab:seed</span>.</p></Band>
+        <TileRow wrap={false}>
+          <Tile wide label="unavailable" value="no corpus is admitted. run npm run lab:seed." />
+        </TileRow>
       ) : (
-        <Band label="Grid" count={`${data.blocks.length} loci`}>
-          <Typographic data={data} />
-        </Band>
+        <Typographic data={data} />
       )}
 
-      <Band label="Metadata">
-        <GeometryMeta
-          data={<>corpus <span className="mono">{data?.corpusSlug ?? '—'}</span>, per-locus token/character counts and letter entropy</>}
-          geometry="a grid whose cell width is token count and whose shade is Shannon letter-entropy (bits), reorderable"
-          actions="select a block · zoom · inspect the passage and its measurements · change sort order (transform) · return"
-          lens={lens}
-          lensCopy={copyFor('typographic', lens)}
-        />
-      </Band>
+      <GeometryMeta
+        data={<>corpus <span className="mono">{data?.corpusSlug ?? '—'}</span>, per-locus token/character counts and letter entropy</>}
+        geometry="a tile grid whose width is token count and whose shade is Shannon letter-entropy (bits), reorderable"
+        actions="select a tile · zoom · inspect the passage and its measurements · change sort order (transform) · return"
+        lens={lens}
+        lensCopy={copyFor('typographic', lens)}
+      />
     </>
   );
 }

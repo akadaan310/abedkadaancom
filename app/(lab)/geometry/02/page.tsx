@@ -1,8 +1,8 @@
 import { provenanceThreadData } from '../../../../lab/geometry/compute';
-import { Band } from '../../../ui';
 import { ProvenanceThread } from '../_lib/ProvenanceThread';
 import { GeometryMeta } from '../_lib/Meta';
 import { GeometrySwitcher } from '../_lib/Switcher';
+import { Tile, TileRow } from '../_lib/Tile';
 import { DEFAULT_LENS, copyFor, isLensSlug } from '../_lib/lenses';
 
 export const dynamic = 'force-dynamic';
@@ -15,33 +15,25 @@ export default async function Geometry02({ searchParams }: { searchParams: Promi
   return (
     <>
       <GeometrySwitcher />
-      <Band label="Geometry 02 · Provenance thread">
-        <div className="column">
-          <p className="lede">Walk any computed object back to its sources.</p>
-          <p className="note">
-            Pick a result. This walks <span className="mono">provenance.parents</span> backward from it, exactly as
-            recorded when it was computed — the same chain a §21 provenance audit would follow.
-          </p>
-        </div>
-      </Band>
+      <TileRow wrap={false}>
+        <Tile wide label="02 · provenance thread" value="Walk any computed object back to its sources, following provenance.parents exactly as recorded when it was computed." />
+      </TileRow>
 
       {!data || data.roots.length === 0 ? (
-        <Band label="Unavailable"><p className="note">The ledger holds nothing with provenance yet. Run <span className="mono">npm run lab:tick 3</span>.</p></Band>
+        <TileRow wrap={false}>
+          <Tile wide label="unavailable" value="the ledger holds nothing with provenance yet. run npm run lab:tick 3." />
+        </TileRow>
       ) : (
-        <Band label="Thread" count={`${data.nodes.length} objects`}>
-          <ProvenanceThread data={data} />
-        </Band>
+        <ProvenanceThread data={data} />
       )}
 
-      <Band label="Metadata">
-        <GeometryMeta
-          data={<>the projected ledger (<span className="mono">/api/state</span>), one object and its ancestry</>}
-          geometry="backward walk of the provenance DAG, laid out by generation or regrouped by object kind"
-          actions="navigate to a different root · select a node · zoom · inspect its derivation and parents · relayout by kind (transform) · return"
-          lens={lens}
-          lensCopy={copyFor('provenance-thread', lens)}
-        />
-      </Band>
+      <GeometryMeta
+        data={<>the projected ledger (<span className="mono">/api/state</span>), one object and its ancestry</>}
+        geometry="backward walk of the provenance DAG, laid out by generation or regrouped by object kind, one tile per object"
+        actions="navigate to a different root · select a tile · zoom · inspect its derivation and parents · relayout by kind (transform) · return"
+        lens={lens}
+        lensCopy={copyFor('provenance-thread', lens)}
+      />
     </>
   );
 }

@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
+import { Tile, TileRow } from './Tile';
 import { LensPicker } from './LensPicker';
 import type { LensSlug } from './lenses';
 
-/** The tiny DATA → GEOMETRY → ACTIONS card that sits beside every prototype. */
+/** DATA → GEOMETRY → ACTIONS, plus the lens reading — each row one wide tile. */
 export function GeometryMeta({
   data,
   geometry,
@@ -17,21 +18,20 @@ export function GeometryMeta({
   lensCopy: string;
 }) {
   return (
-    <div className="geo-meta">
-      <div className="geo-meta-row">
-        <span className="geo-meta-k">Data</span>
-        <span className="geo-meta-v">{data}</span>
-      </div>
-      <div className="geo-meta-row">
-        <span className="geo-meta-k">Geometry</span>
-        <span className="geo-meta-v">{geometry}</span>
-      </div>
-      <div className="geo-meta-row">
-        <span className="geo-meta-k">Actions</span>
-        <span className="geo-meta-v">{actions}</span>
-      </div>
+    <div>
+      <TileRow wrap={false}>
+        <Tile wide label="data" value={data} />
+      </TileRow>
+      <TileRow wrap={false}>
+        <Tile wide label="geometry" value={geometry} />
+      </TileRow>
+      <TileRow wrap={false}>
+        <Tile wide label="actions" value={actions} />
+      </TileRow>
       <LensPicker current={lens} />
-      <p className="geo-lens-copy">{lensCopy}</p>
+      <TileRow wrap={false}>
+        <Tile wide label={`read as · ${lens}`} value={lensCopy} />
+      </TileRow>
     </div>
   );
 }

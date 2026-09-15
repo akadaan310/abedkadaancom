@@ -626,93 +626,62 @@ nav.secondary a[aria-current="page"] { color: var(--ink); border-bottom-color: v
 }
 .cat-nav a[aria-current="true"] { color: var(--ink); border-bottom-color: var(--ink); }
 
-/* ---------------------------------------------------------------- geometry prototypes */
+/* ---------------------------------------------------------------- geometry prototypes
+   The whole section is one shape: a bordered block of typewriter text, outlined for
+   chrome or filled to a measured shade for data, tiled across an infinite pannable
+   surface. Nothing here is a button, a card or a prose band — everything is a tile. */
 
-.geo-switcher { border-bottom: 1px solid var(--rule); padding: 1.1rem 0 0.9rem; margin-bottom: 0.5rem; }
-.geo-switcher-home {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
-  color: var(--faint); border: none; margin-bottom: 0.2rem; display: inline-flex; align-items: center; min-height: 44px;
-}
-.geo-switcher-home:hover { color: var(--ink); }
-.geo-switcher-links { display: flex; flex-wrap: wrap; gap: 0 1.1rem; }
-.geo-switcher-links a {
-  display: inline-flex; align-items: baseline; gap: 0.4rem; min-height: 44px; padding: 0.2rem 0;
-  border: none; border-bottom: 1px solid transparent;
-  font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);
-}
-.geo-switcher-links a:hover { color: var(--ink); border-bottom-color: var(--rule-firm); }
-.geo-switcher-links a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
-.geo-switcher-no { color: var(--faint); }
-.geo-switcher-links a[aria-current="page"] .geo-switcher-no { color: var(--ink); }
+.tile-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.tile-row--nowrap { flex-wrap: nowrap; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-.geo-proto { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-@media (min-width: 52rem) {
-  .geo-proto { grid-template-columns: minmax(0, 1fr) 20rem; align-items: start; }
+.tile {
+  box-sizing: border-box;
+  font-family: var(--mono);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 2px;
+  padding: 5px 7px;
+  overflow: hidden;
+  border: 1px solid var(--rule-firm);
+  background: var(--paper);
+  min-width: 5rem;
+  min-height: 44px;
+  text-decoration: none;
 }
+.tile--wide { width: 100%; max-width: 42rem; min-height: 2.75rem; }
+.tile--outline { background: var(--paper); }
+.tile--filled {
+  background: color-mix(in oklab, var(--ink) calc(var(--shade, 0.7) * 100%), var(--paper-sunk));
+  border-color: color-mix(in oklab, var(--ink) calc(var(--shade, 0.7) * 100%), var(--rule-firm));
+}
+.tile--filled .tile-label,
+.tile--filled .tile-value,
+.tile--filled .tile-sub { color: color-mix(in oklab, var(--paper) 85%, transparent); }
+.tile--interactive { cursor: pointer; }
+.tile--interactive:hover { border-color: var(--ink); }
+.tile--selected { border-color: var(--stamp); border-width: 2px; }
+.tile--accent.tile--outline { color: var(--stamp); border-color: var(--stamp); }
+.tile--accent.tile--filled { border-color: var(--stamp); border-width: 2px; }
 
-.geo-stage { border: 1px solid var(--rule-firm); background: var(--paper-sunk); }
-.geo-stage-toolbar {
-  display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;
-  padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--rule);
+.tile-label {
+  font-size: 8.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.geo-stage-toolbar button {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--muted); background: none; border: 1px solid var(--rule-firm);
-  padding: 0.4rem 0.65rem; cursor: pointer; min-height: 34px;
-}
-.geo-stage-toolbar button:hover { color: var(--ink); border-color: var(--ink); }
-.geo-stage-hint { font-family: var(--mono); font-size: 9.5px; color: var(--faint); margin-left: auto; }
-.geo-stage-canvas { display: block; width: 100%; height: auto; touch-action: none; }
-.geo-node-label {
-  font-family: var(--mono); font-size: 6.5px; letter-spacing: 0.02em; fill: var(--muted);
-  text-anchor: middle; pointer-events: none;
-}
-.geo-axis-label { font-family: var(--mono); font-size: 8px; letter-spacing: 0.08em; fill: var(--faint); text-transform: uppercase; }
+.tile-value { font-size: 11px; line-height: 1.3; color: var(--ink); overflow-wrap: break-word; word-break: normal; }
+.tile--wide .tile-value { white-space: pre-wrap; font-size: 12.5px; line-height: 1.6; }
+.tile-sub { font-size: 9px; color: var(--muted); }
+.tile--filled .tile-sub { color: color-mix(in oklab, var(--paper) 70%, transparent); }
 
-.geo-side { display: flex; flex-direction: column; gap: 1rem; }
-.geo-figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: 0.9rem; }
-.geo-figures .figure { font-size: 1.15rem; }
-
-.geo-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.75rem; }
-.geo-actions button {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink); background: none; border: 1px solid var(--rule-firm);
-  padding: 0.5rem 0.75rem; cursor: pointer; min-height: 40px;
-}
-.geo-actions button:hover:not(:disabled) { border-color: var(--ink); }
-.geo-actions button:disabled { color: var(--faint); cursor: default; }
-
-.geo-inspect { padding-top: 0.5rem; }
-.geo-inspect p.arabic { margin: 0.4rem 0; }
-
-.geo-toprow { display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
-.geo-toprow-label {
-  font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
-}
-.geo-toprow-x { color: var(--faint); font-family: var(--mono); font-size: 11px; }
-.geo-toprow select, .geo-root-picker {
-  font-family: var(--mono); font-size: 0.78rem; color: var(--ink); background: var(--paper);
-  border: 1px solid var(--rule-firm); padding: 0.4rem 0.5rem; min-height: 36px; max-width: 16rem;
+.tile-canvas { border: 1px solid var(--rule-firm); margin-top: 0.5rem; }
+.tile-canvas-toolbar { padding: 8px; border-bottom: 1px solid var(--rule); background: var(--paper-sunk); margin: 0; }
+.tile-canvas-viewport { position: relative; overflow: hidden; background: var(--paper-sunk); touch-action: none; }
+.tile-canvas-field {
+  position: absolute; top: 0; left: 0; transform-origin: 0 0;
+  background-image:
+    linear-gradient(to right, var(--rule) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--rule) 1px, transparent 1px);
+  background-size: var(--cell, 64px) var(--cell, 64px);
 }
 
-.geo-meta { border-top: 1px solid var(--rule); padding-top: 1rem; max-width: 40rem; }
-.geo-meta-row { display: grid; grid-template-columns: 6.5rem 1fr; gap: 0 1rem; padding: 0.4rem 0; align-items: baseline; }
-.geo-meta-k {
-  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint);
-}
-.geo-meta-v { font-size: 0.9rem; color: var(--ink-soft); }
-
-.geo-lens { margin-top: 1.25rem; padding-top: 0.9rem; border-top: 1px solid var(--rule); }
-.geo-lens-label {
-  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--faint);
-  display: block; margin-bottom: 0.5rem;
-}
-.geo-lens-options { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-.geo-lens-btn {
-  font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--muted); background: none; border: 1px solid var(--rule); padding: 0.35rem 0.6rem;
-  cursor: pointer; min-height: 34px;
-}
-.geo-lens-btn:hover { color: var(--ink); border-color: var(--rule-firm); }
-.geo-lens-btn[aria-current="true"] { color: var(--ink); border-color: var(--ink); }
-.geo-lens-copy { margin-top: 0.85rem; color: var(--ink-soft); font-size: 0.92rem; line-height: 1.55; max-width: 38rem; }
+.geo-switcher-note { color: var(--muted); font-size: 0.85rem; margin: 0.75rem 0; max-width: 38rem; }

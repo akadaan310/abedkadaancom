@@ -1,8 +1,8 @@
 import { researchFieldData } from '../../../../lab/geometry/compute';
-import { Band } from '../../../ui';
 import { ResearchField } from '../_lib/ResearchField';
 import { GeometryMeta } from '../_lib/Meta';
 import { GeometrySwitcher } from '../_lib/Switcher';
+import { Tile, TileRow } from '../_lib/Tile';
 import { DEFAULT_LENS, copyFor, isLensSlug } from '../_lib/lenses';
 
 export const dynamic = 'force-dynamic';
@@ -15,29 +15,19 @@ export default async function Geometry03({ searchParams }: { searchParams: Promi
   return (
     <>
       <GeometrySwitcher />
-      <Band label="Geometry 03 · Research field">
-        <div className="column">
-          <p className="lede">The frontier, spatialized by its own declared economy.</p>
-          <p className="note">
-            Each point is a real frontier item — a question, hypothesis, counterexample or capability gap the
-            laboratory logged. Its position is its own declared expected gain and priority (§46, §99), not a layout choice.
-          </p>
-        </div>
-      </Band>
+      <TileRow wrap={false}>
+        <Tile wide label="03 · research field" value="The frontier, spatialized by its own declared expected gain, priority and novelty — not a layout choice." />
+      </TileRow>
 
-      <Band label="Field" count={`${data.points.length} items`}>
-        <ResearchField data={data} />
-      </Band>
+      <ResearchField data={data} />
 
-      <Band label="Metadata">
-        <GeometryMeta
-          data="the research frontier (lab/frontier/frontier.ts), open and closed items"
-          geometry="scatter on (expectedInformationGain, researchPriority), point size = novelty, or 1-D rank by utility"
-          actions="select a point · zoom · inspect its subject, reason and cost · rank by utility (transform) · return"
-          lens={lens}
-          lensCopy={copyFor('research-field', lens)}
-        />
-      </Band>
+      <GeometryMeta
+        data="the research frontier (lab/frontier/frontier.ts), open and closed items"
+        geometry="tile grid on (expectedInformationGain, researchPriority), or a 1-D rank by utility"
+        actions="select a tile · zoom · inspect its subject, reason and cost · rank by utility (transform) · return"
+        lens={lens}
+        lensCopy={copyFor('research-field', lens)}
+      />
     </>
   );
 }

@@ -1,12 +1,14 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Stage } from './Stage';
+import { TileCanvas } from './TileCanvas';
+import { Tile, TileRow } from './Tile';
+import { resolvePlacement, normalize } from './grid';
 import type { ResearchFieldData } from '../../../../lab/geometry/compute';
 
-const W = 640;
-const H = 440;
-const PAD = 56;
+const COLS = 12;
+const ROWS = 8;
+const CELL = 68;
 
 export function ResearchField({ data }: { data: ResearchFieldData }) {
   const [selected, setSelected] = useState<string | null>(null);
@@ -14,92 +16,86 @@ export function ResearchField({ data }: { data: ResearchFieldData }) {
 
   const sortedByUtility = useMemo(() => [...data.points].sort((a, b) => b.utility - a.utility), [data.points]);
 
-  const positions = useMemo(() => {
+  const fieldPositions = useMemo(
+    () =>
+      resolvePlacement(
+        data.points,
+        (p) => p.id,
+        (p) => normalize(p.x, 0, 1, COLS),
+        (p) => normalize(1 - p.y, 0, 1, ROWS),
+        COLS,
+        ROWS,
+      ),
+    [data.points],
+  );
+  const rankedPositions = useMemo(() => {
     const pos = new Map<string, { x: number; y: number }>();
-    if (!ranked) {
-      for (const p of data.points) {
-        pos.set(p.id, {
-          x: PAD + p.x * (W - 2 * PAD),
-          y: H - PAD - p.y * (H - 2 * PAD),
-        });
-      }
-    } else {
-      const maxU = Math.max(1e-6, ...sortedByUtility.map((p) => p.utility));
-      sortedByUtility.forEach((p, i) => {
-        const x = sortedByUtility.length === 1 ? W / 2 : PAD + (i / (sortedByUtility.length - 1 || 1)) * (W - 2 * PAD);
-        const y = H - PAD - (p.utility / maxU) * (H - 2 * PAD);
-        pos.set(p.id, { x, y });
-      });
-    }
+    sortedByUtility.forEach((p, i) => pos.set(p.id, { x: i, y: 0 }));
     return pos;
-  }, [data.points, ranked, sortedByUtility]);
+  }, [sortedByUtility]);
+  const positions = ranked ? rankedPositions : fieldPositions;
 
   const selectedPoint = selected ? data.points.find((p) => p.id === selected) ?? null : null;
 
   return (
-    <div className="geo-proto">
-      <Stage viewWidth={W} viewHeight={H} ariaLabel="Research field" onReturn={() => setSelected(null)}>
-        {!ranked && (
-          <>
-            <line x1={PAD} y1={H - PAD} x2={W - PAD} y2={H - PAD} stroke="var(--rule)" strokeWidth={1} />
-            <line x1={PAD} y1={PAD} x2={PAD} y2={H - PAD} stroke="var(--rule)" strokeWidth={1} />
-            <text x={W / 2} y={H - PAD + 26} textAnchor="middle" className="geo-axis-label">expected information gain →</text>
-            <text x={PAD - 14} y={H / 2} textAnchor="middle" className="geo-axis-label" transform={`rotate(-90 ${PAD - 14} ${H / 2})`}>research priority →</text>
-          </>
-        )}
+    <div>
+      <TileCanvas
+        cell={CELL}
+        height={ranked ? CELL + 8 : ROWS * CELL + 8}
+        ariaLabel="Research field"
+        onReturn={() => setSelected(null)}
+      >
         {data.points.map((p) => {
           const pos = positions.get(p.id);
           if (!pos) return null;
-          const r = 3 + p.size * 9;
+          const isSelected = p.id === selected;
           const closed = p.state === 'CLOSED';
           const contested = p.state === 'HIGHLY_CONTESTED';
-          const isSelected = p.id === selected;
           return (
-            <g key={p.id} transform={`translate(${pos.x} ${pos.y})`} onClick={() => setSelected(p.id)} style={{ cursor: 'pointer' }}>
-              {isSelected && <circle r={r + 6} fill="none" stroke="var(--stamp)" strokeWidth={1.2} />}
-              <circle
-                r={r}
-                fill={closed ? 'none' : contested ? 'var(--stamp)' : 'var(--ink)'}
-                fillOpacity={closed ? 0 : 0.72}
-                stroke={closed ? 'var(--faint)' : 'none'}
-                strokeDasharray={closed ? '2 2' : undefined}
-              />
-            </g>
+            <Tile
+              key={p.id}
+              x={pos.x}
+              y={pos.y}
+              cell={CELL}
+              filled={!closed}
+              shade={contested ? 0.9 : 0.4 + p.size * 0.4}
+              accent={contested}
+              selected={isSelected}
+              dim={closed}
+              label={p.itemKind}
+              value={p.subject.slice(0, 20)}
+              sub={ranked ? `u ${p.utility.toFixed(2)}` : p.state}
+              onClick={() => setSelected(p.id)}
+              title={p.subject}
+            />
           );
         })}
-      </Stage>
+      </TileCanvas>
 
-      <div className="geo-side">
-        <div className="geo-figures">
-          <div><span className="figure">{data.points.length}</span><span className="figure-label">frontier items</span></div>
-          <div><span className="figure">{data.points.filter((p) => p.state !== 'CLOSED').length}</span><span className="figure-label">still open</span></div>
-        </div>
-        <div className="geo-actions">
-          <button type="button" onClick={() => setRanked((v) => !v)}>
-            {ranked ? 'plot by gain × priority (undo transform)' : 'rank by utility (transform)'}
-          </button>
-        </div>
-        {selectedPoint ? (
-          <article className="record geo-inspect">
-            <div className="record-head">
-              <span className="tag tag--ink">{selectedPoint.itemKind}</span>
-              <span className="tag tag--quiet">{selectedPoint.state}</span>
-              <span className="spacer" />
-              <span className="num" style={{ color: 'var(--faint)', fontSize: '0.72rem' }}>
-                utility {selectedPoint.utility.toFixed(3)}
-              </span>
-            </div>
-            <p>{selectedPoint.subject}</p>
-            <p className="guard">{selectedPoint.reason}</p>
-            <p className="record-meta">
-              gain {selectedPoint.x.toFixed(2)} · priority {selectedPoint.y.toFixed(2)} · novelty {selectedPoint.size.toFixed(2)} ·
-              cost {selectedPoint.costEstimate} · proposed by {selectedPoint.proposedBy}
-            </p>
-          </article>
-        ) : (
-          <p className="note">Select a point to see what it is and why it is on the frontier.</p>
-        )}
-      </div>
+      <TileRow>
+        <Tile label="frontier items" value={data.points.length} />
+        <Tile label="still open" value={data.points.filter((p) => p.state !== 'CLOSED').length} />
+        <Tile
+          label="transform"
+          value={ranked ? 'plot gain × priority' : 'rank by utility'}
+          onClick={() => setRanked((v) => !v)}
+          accent={ranked}
+        />
+      </TileRow>
+
+      {selectedPoint ? (
+        <TileRow wrap={false}>
+          <Tile
+            wide
+            label={`${selectedPoint.itemKind} · ${selectedPoint.state} · utility ${selectedPoint.utility.toFixed(3)}`}
+            value={`${selectedPoint.subject}\n${selectedPoint.reason}\ngain ${selectedPoint.x.toFixed(2)} · priority ${selectedPoint.y.toFixed(2)} · novelty ${selectedPoint.size.toFixed(2)} · cost ${selectedPoint.costEstimate} · proposed by ${selectedPoint.proposedBy}`}
+          />
+        </TileRow>
+      ) : (
+        <TileRow wrap={false}>
+          <Tile wide label="inspect" value="select a tile to see what it is and why it is on the frontier." />
+        </TileRow>
+      )}
     </div>
   );
 }

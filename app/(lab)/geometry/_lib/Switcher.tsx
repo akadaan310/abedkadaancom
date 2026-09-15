@@ -1,9 +1,10 @@
 'use client';
 
 import { usePathname, useSearchParams } from 'next/navigation';
+import { Tile, TileRow } from './Tile';
 import { GEOMETRIES } from './geometries';
 
-/** GEOMETRY 01 / 02 / 03 / 04 / 05 — the prototype switcher. Carries ?lens= across it. */
+/** GEOMETRY 01 / 02 / 03 / 04 / 05 — the prototype switcher, itself a row of tiles. */
 export function GeometrySwitcher() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -11,20 +12,23 @@ export function GeometrySwitcher() {
   const suffix = lens ? `?lens=${lens}` : '';
 
   return (
-    <nav className="geo-switcher" aria-label="Geometry prototypes">
-      <a href={`/geometry${suffix}`} className="geo-switcher-home">Geometry</a>
-      <div className="geo-switcher-links">
+    <nav aria-label="Geometry prototypes">
+      <TileRow>
+        <Tile label="geometry" value="index" href={`/geometry${suffix}`} selected={pathname === '/geometry'} style={{ minWidth: '6.5rem' }} />
         {GEOMETRIES.map((g) => {
           const href = `/geometry/${g.slug}`;
-          const active = pathname === href;
           return (
-            <a key={g.slug} href={`${href}${suffix}`} {...(active ? { 'aria-current': 'page' as const } : {})}>
-              <span className="geo-switcher-no">{g.slug}</span>
-              <span className="geo-switcher-name">{g.name}</span>
-            </a>
+            <Tile
+              key={g.slug}
+              label={g.slug}
+              value={g.name}
+              href={`${href}${suffix}`}
+              selected={pathname === href}
+              style={{ minWidth: '6.5rem' }}
+            />
           );
         })}
-      </div>
+      </TileRow>
     </nav>
   );
 }
