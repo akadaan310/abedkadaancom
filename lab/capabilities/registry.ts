@@ -12,6 +12,7 @@ import { relationCapabilities } from './relations';
 import { structureCapabilities } from './structures';
 import { measurementCapabilities } from './measurement';
 import { challengeCapabilities } from './challenge';
+import { geometryCapabilities } from './geometry';
 import type { DeclaredAbsence } from '../ontology/types';
 
 export function buildRegistry(): CapabilityRegistry {
@@ -22,6 +23,7 @@ export function buildRegistry(): CapabilityRegistry {
     ...structureCapabilities,
     ...measurementCapabilities,
     ...challengeCapabilities,
+    ...geometryCapabilities,
   ]) {
     registry.register(cap);
   }

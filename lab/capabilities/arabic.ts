@@ -117,6 +117,7 @@ export const selectLoci: Capability = {
   configKeys: [
     { key: 'addressPrefix', type: 'number|null', default: null, note: 'Keep only loci whose first address component matches.' },
     { key: 'exclude', type: 'number|null', default: null, note: 'Drop loci whose first address component matches (holdout tests).' },
+    { key: 'limit', type: 'number|null', default: null, note: 'Keep at most this many loci, in corpus order. Relations are pairwise, so an unbounded selection is quadratic; a bounded one is recorded in provenance and reproducible.' },
   ],
   costUnits: 1,
   latencyHintMs: 1,
@@ -127,12 +128,14 @@ export const selectLoci: Capability = {
     if (!input || input.type !== 'LocusSet') throw new Error('corpus.select_loci requires a LocusSet');
     const prefix = config['addressPrefix'];
     const exclude = config['exclude'];
-    const loci = input.loci.filter((l) => {
+    const limit = config['limit'];
+    const filtered = input.loci.filter((l) => {
       const head = l.address[0];
       if (typeof prefix === 'number' && head !== prefix) return false;
       if (typeof exclude === 'number' && head === exclude) return false;
       return true;
     });
+    const loci = typeof limit === 'number' && limit >= 0 ? filtered.slice(0, Math.round(limit)) : filtered;
     return { type: 'LocusSet', corpusSlug: input.corpusSlug, loci };
   },
 };

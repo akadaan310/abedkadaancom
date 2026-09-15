@@ -9,6 +9,9 @@ import { buildRegistry } from '../../../lab/runtime';
 import { synthesizeCorpus, loadCorpusDirectory } from '../../../lab/corpus/loader';
 import { computeContext, type LabValue } from '../../../lab/capabilities/kernel';
 import { CORPUS_DIR } from '../../../lab/runtime';
+
+/** Bounded so the page renders; the bound is recorded in the provenance of every figure. */
+const DISPATCH_LOCI = 28;
 import { Band, fmt } from '../../ui';
 import type { Corpus, Measurement } from '../../../lab/ontology/types';
 
@@ -31,7 +34,10 @@ function measure(corpus: Corpus, seed = 42): { primary?: Measurement; control?: 
     engineId: 'dispatch',
     engineVersion: 1,
   });
-  const input: LabValue = { type: 'LocusSet', corpusSlug: corpus.slug, loci: corpus.loci };
+  const full: LabValue = { type: 'LocusSet', corpusSlug: corpus.slug, loci: corpus.loci };
+  // Relations are pairwise. The admitted corpus is far larger than a page render can
+  // compute over, so the selection is bounded here and the bound is part of the recipe.
+  const input = registry.require('corpus.select_loci').run([full], { limit: DISPATCH_LOCI }, ctx);
   const norm = registry.require('text.normalize.arabic').run([input], {}, ctx);
   const profiles = registry.require('observable.letter_profile').run([norm], {}, ctx);
   const relations = registry.require('relation.cosine_profile').run([profiles], { threshold: 0.75 }, ctx);
@@ -164,9 +170,10 @@ export default async function Dispatch() {
           entitled to watch it being made.
         </p>
         <p>
-          The corrected instrument reports no significant structure in the real corpus. That is the current, honest
-          state of this laboratory — zero supported findings, published on its front page. The finding that would have
-          been announced was not a discovery. It was a measurement of the measuring device.
+          The corrected instrument reports no significant community structure in the admitted material. The finding
+          that would have been announced was not a discovery; it was a measurement of the measuring device. Whatever
+          this laboratory does or does not support at any moment is computed and published on its front page, and the
+          table above is recomputed when you open this page rather than quoted from memory.
         </p>
 
         <details className="more">

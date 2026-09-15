@@ -143,7 +143,7 @@ export const SERVICES: readonly Service[] = [
     name: 'Open Method',
     dek: 'The method, the code and the failures published in the open — including this laboratory.',
     body: [
-      'Everything demonstrated on this site is a working system with its source available, not a case study written after the fact. The negative results are published beside the positive ones, and the laboratory currently reports no supported findings at all — which is the point.',
+      'Everything demonstrated on this site is a working system with its source available, not a case study written after the fact. The negative results are published beside the positive ones, every measurement carries the null model it was tested against and a written statement of what it does not license, and the count of supported findings is computed from the ledger rather than asserted — including when that count is zero.',
       'Collaboration, replication, teaching and joint publication all sit here. Sponsoring open work is also possible, on the condition that sponsorship never decides an outcome.',
     ],
     forWhom: 'Researchers, institutions, funders and anyone who would rather check the work than be told about it.',

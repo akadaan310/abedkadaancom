@@ -62,7 +62,7 @@ describe('text.rasm_skeleton declares LOSSY', () => {
 
 describe('every declared transform is honest about invertibility', () => {
   it('no capability claims INVERTIBLE while merging distinct inputs on the real corpus', async () => {
-    const corpus = await loadCorpusFile('lab/corpus/data/quran-short-surahs.json');
+    const corpus = await loadCorpusFile('lab/corpus/data/tanzil-uthmani.json');
     const registry = buildRegistry();
     const ctx = computeContext({
       now: new Date().toISOString(),
@@ -74,6 +74,9 @@ describe('every declared transform is honest about invertibility', () => {
       engineVersion: 1,
     });
     const input: LabValue = { type: 'LocusSet', corpusSlug: corpus.slug, loci: corpus.loci };
+    // The sweep covers every locus, so the lookup has to be a map: a linear scan per item
+    // would make this test quadratic in the size of the corpus.
+    const byId = new Map(corpus.loci.map((l) => [l.id, l]));
 
     for (const cap of registry.all()) {
       if (cap.transform?.invertibility !== 'INVERTIBLE') continue;
@@ -81,7 +84,7 @@ describe('every declared transform is honest about invertibility', () => {
       const out = cap.run([input], {}, ctx);
       if (out.type !== 'TextSet') continue;
       for (const item of out.items) {
-        const original = corpus.loci.find((l) => l.id === item.id)!;
+        const original = byId.get(item.id)!;
         expect(rejoinDiacritics(item.text, item.removed ?? [])).toBe(original.text);
       }
     }

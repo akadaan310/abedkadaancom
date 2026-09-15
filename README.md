@@ -82,7 +82,7 @@ Adding a provider is a row in that table.
 | Ontology | `lab/ontology/` | Computational primitives (§12); epistemic types and lifecycles (§15, §28) |
 | Provenance | `lab/provenance/` | Machine-readable ancestry, completeness audit, lineage (§21, §65) |
 | Ledger | `lab/ledger/` | Append-only hash-chained events, projection, materialized index (§22, §64) |
-| Capabilities | `lab/capabilities/` | 21 real computations: Arabic transforms, observables, typed relations, community detection, MDS embedding, permutation and rewiring null models, challenge instruments |
+| Capabilities | `lab/capabilities/` | 22 real computations: bounded corpus selection, text transforms, observables, typed relations, community detection, MDS embedding, principal-axis geometry, permutation and rewiring null models, challenge instruments |
 | Engines | `lab/engine/` | Composition with static type-checking, execution, auditor, promotion gate (§7, §61, §69) |
 | Nano-LLMs | `lab/nano/` | Role contracts, structured proposals, provider-agnostic routing (§5, §23, §62) |
 | Models | `lab/models/` | The shared provider population |
@@ -100,10 +100,12 @@ author `COMPUTED`, `DERIVED` or `INFERENCE` — those require an executed instru
 it cannot change an instrument's status at all. The check is a throwing guard in the data
 model (`lab/ontology/epistemic.ts`), not a naming convention.
 
-**It will not publish from an unverified source.** The working corpus is admitted as
-`UNVERIFIED_TRANSCRIPTION`. Instruments may compute over it; the promotion gate refuses
-to make any result resting on it `CANONICAL` until a human researcher verifies the text
-against a named edition (`lab/engine/promote.ts`). See [`lab/corpus/README.md`](./lab/corpus/README.md).
+**It will not publish from an unverified source.** The corpus register holds a verbatim
+copy of a named, licensed digital edition, checksummed and rebuildable by
+`scripts/fetch-corpus.mjs` — and it is still admitted as `UNVERIFIED_TRANSCRIPTION`,
+because §29 reserves the verified declaration for a human. Instruments may compute over it;
+the promotion gate refuses to make any result resting on it `CANONICAL` until a researcher
+makes that call (`lab/engine/promote.ts`). See [`lab/corpus/README.md`](./lab/corpus/README.md).
 
 ## A worked example of why this matters
 
@@ -120,14 +122,18 @@ separates the cases cleanly:
 |---|---|---|---|
 | synthetic, cohesion 0.95 | yes | ~0.01 | **yes** |
 | synthetic, cohesion 0.0 | none | ~0.77 | no |
-| quran-short-surahs | unknown | ~0.15 | no |
+| admitted material | unknown | recomputed on page load | no |
 
 Both null models are kept and displayed, the inadequate one labelled
 `CONTROL, NOT A FINDING`. The full account is at `/dispatches/the-result-that-wasnt`,
 where those figures are computed when the page is opened.
 
-**The current honest state: zero supported findings.** No computed relation on this
-corpus exceeds its null model, and the site says so on its front page.
+**What the laboratory currently supports is computed, not asserted.** The front page reads
+the ledger and reports the number of measurements that exceed their null model — including
+when that number is zero, which is the state this system is designed to be able to publish.
+Every measurement is displayed with the null model it was tested against and a written
+statement of what it does not license, so a number that passes its null is still not
+licensed to mean more than it does.
 
 ## Security
 

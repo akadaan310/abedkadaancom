@@ -18,6 +18,13 @@ import { seedFrom } from '../../capabilities/rng';
 import { modelUse, type ModelProvider, type ProviderResponse } from '../provider';
 import { NanoProposalBodySchema, type NanoContext, type NanoProposalBody, type NanoRole } from '../contract';
 
+/**
+ * Relations are pairwise, so an unbounded selection over an admitted corpus is quadratic.
+ * Every composition this proposer emits therefore selects a bounded set first, and the
+ * bound travels with the engine as recorded configuration rather than living in a page.
+ */
+const SELECTION_LIMIT = 40;
+
 const MODEL_VERSION = 'heuristic-v1';
 
 /**
@@ -31,12 +38,14 @@ function candidateCompositions(question: string, ctx: NanoContext) {
   const corpus = ctx.corpora[0]?.slug ?? '';
 
   const letterPath = [
-    { capability: 'text.normalize.arabic', from: ['input'], as: 'normalized', config: {} },
+    { capability: 'corpus.select_loci', from: ['input'], as: 'selected', config: { limit: SELECTION_LIMIT } },
+    { capability: 'text.normalize.arabic', from: ['selected'], as: 'normalized', config: {} },
     { capability: 'observable.letter_profile', from: ['normalized'], as: 'profiles', config: {} },
     { capability: 'relation.cosine_profile', from: ['profiles'], as: 'relations', config: { threshold: 0.85 } },
   ];
   const lexicalPath = [
-    { capability: 'text.normalize.arabic', from: ['input'], as: 'normalized', config: {} },
+    { capability: 'corpus.select_loci', from: ['input'], as: 'selected', config: { limit: SELECTION_LIMIT } },
+    { capability: 'text.normalize.arabic', from: ['selected'], as: 'normalized', config: {} },
     { capability: 'text.tokenize', from: ['normalized'], as: 'tokens', config: {} },
     { capability: 'relation.jaccard_tokens', from: ['tokens'], as: 'relations', config: { threshold: 0.2 } },
   ];
@@ -178,12 +187,14 @@ function challengerBody(ctx: NanoContext): NanoProposalBody {
   const head =
     relationStep === 'relation.jaccard_tokens'
       ? [
-          { capability: 'text.normalize.arabic', from: ['input'], as: 'normalized', config: {} },
+          { capability: 'corpus.select_loci', from: ['input'], as: 'selected', config: { limit: SELECTION_LIMIT } },
+    { capability: 'text.normalize.arabic', from: ['selected'], as: 'normalized', config: {} },
           { capability: 'text.tokenize', from: ['normalized'], as: 'tokens', config: {} },
           { capability: 'relation.jaccard_tokens', from: ['tokens'], as: 'relations', config: { threshold: 0.2 } },
         ]
       : [
-          { capability: 'text.normalize.arabic', from: ['input'], as: 'normalized', config: {} },
+          { capability: 'corpus.select_loci', from: ['input'], as: 'selected', config: { limit: SELECTION_LIMIT } },
+    { capability: 'text.normalize.arabic', from: ['selected'], as: 'normalized', config: {} },
           { capability: 'observable.letter_profile', from: ['normalized'], as: 'profiles', config: {} },
           { capability: 'relation.cosine_profile', from: ['profiles'], as: 'relations', config: { threshold: 0.85 } },
         ];

@@ -50,7 +50,7 @@ describe('self-discovery is not self-authorization (§10, §29)', () => {
   });
 
   it('refuses CANONICAL when the source text is unverified', async () => {
-    const corpus = await loadCorpusFile('lab/corpus/data/quran-short-surahs.json');
+    const corpus = await loadCorpusFile('lab/corpus/data/tanzil-uthmani.json');
     const decision = canPromote({
       engine: { ...engine, inputs: { corpus: corpus.slug } } as Engine,
       to: 'CANONICAL',
@@ -142,7 +142,7 @@ describe('engines cannot be built from capabilities that do not exist (§66, §9
 
 describe('results carry complete provenance and reproduce (§21, §65, §96)', () => {
   it('records engine, sources, derivation and seed, and reproduces exactly', async () => {
-    const corpus = await loadCorpusFile('lab/corpus/data/quran-short-surahs.json');
+    const corpus = await loadCorpusFile('lab/corpus/data/tanzil-uthmani.json');
     const registry = buildRegistry();
     const engine = composeEngine({
       spec: {
@@ -150,7 +150,8 @@ describe('results carry complete provenance and reproduce (§21, §65, §96)', (
         purpose: 'p',
         question: 'q',
         steps: [
-          { capability: 'text.normalize.arabic', from: ['input'], as: 'norm', config: {} },
+          { capability: 'corpus.select_loci', from: ['input'], as: 'sel', config: { limit: 40 } },
+          { capability: 'text.normalize.arabic', from: ['sel'], as: 'norm', config: {} },
           { capability: 'observable.letter_profile', from: ['norm'], as: 'prof', config: {} },
           { capability: 'relation.cosine_profile', from: ['prof'], as: 'rel', config: { threshold: 0.85 } },
           { capability: 'structure.threshold_graph', from: ['rel'], as: 'g', config: {} },
@@ -190,7 +191,7 @@ describe('results carry complete provenance and reproduce (§21, §65, §96)', (
   });
 
   it('records a failure as research state instead of throwing it away (§48)', async () => {
-    const corpus = await loadCorpusFile('lab/corpus/data/quran-short-surahs.json');
+    const corpus = await loadCorpusFile('lab/corpus/data/tanzil-uthmani.json');
     const registry = buildRegistry();
     const engine = composeEngine({
       spec: {
@@ -199,7 +200,8 @@ describe('results carry complete provenance and reproduce (§21, §65, §96)', (
         question: 'q',
         // Well-typed, but the threshold leaves too few relations for the measurement.
         steps: [
-          { capability: 'text.normalize.arabic', from: ['input'], as: 'norm', config: {} },
+          { capability: 'corpus.select_loci', from: ['input'], as: 'sel', config: { limit: 40 } },
+          { capability: 'text.normalize.arabic', from: ['sel'], as: 'norm', config: {} },
           { capability: 'observable.letter_profile', from: ['norm'], as: 'prof', config: {} },
           { capability: 'relation.cosine_profile', from: ['prof'], as: 'rel', config: { threshold: 0.999 } },
           { capability: 'structure.threshold_graph', from: ['rel'], as: 'g', config: {} },

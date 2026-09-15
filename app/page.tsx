@@ -39,7 +39,7 @@ export default async function Cover() {
           <span>{SERVICES.length} services</span>
           <span>{PROGRAMS.length} free programs</span>
           <span>{state.engines.length} instruments built</span>
-          <span>{supported.length} findings claimed</span>
+          <span>{supported.length} {supported.length === 1 ? 'finding' : 'findings'} claimed</span>
           <span>Ledger {chain.intact ? 'intact' : 'broken'}</span>
         </div>
       </div>
@@ -132,7 +132,7 @@ export default async function Cover() {
           <p className="note">
             {supported.length === 0
               ? `A working laboratory, open to inspection: ${state.engines.length} instruments composed, ${state.metrics.enginesRun} executed, ${withNull.length} measurements tested against a declared null model, and zero findings claimed. An instrument that always finds something is broken; this one is built so that a zero is publishable.`
-              : `${supported.length} finding(s) currently exceed their null model, each published with the null used and a written statement of what it does not license.`}
+              : `${supported.length} ${supported.length === 1 ? 'measurement currently exceeds' : 'measurements currently exceed'} the null model declared for it, each published with that null and a written statement of what it does not license. Exceeding a null model is not the same as being true.`}
           </p>
           <p className="note">
             <a href="/laboratory">Enter the laboratory →</a>
